@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Projeto Equilibrium</title>
+    <!-- Futuramente criaremos o arquivo css, por enquanto usamos estilos inline básicos para validação estrutural -->
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #666; }
+        input[type="email"], input[type="password"] { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 0.75rem; background-color: #5c6bc0; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #3f51b5; }
+        .mensagens { margin-bottom: 1rem; }
+        .erro { color: #d32f2f; background-color: #ffebee; padding: 0.5rem; border-radius: 4px; font-size: 0.9rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Equilibrium</h2>
+        
+        <!-- Bloco para exibir erros de login (flash messages) -->
+        <div class="mensagens">
+            {% with messages = get_flashed_messages(category_filter=["error"]) %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="erro">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Formulário apontando para a própria rota via método POST -->
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required autofocus placeholder="seu@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit">Entrar no Sistema</button>
+        </form>
+    </div>
+
+</body>
+</html>
