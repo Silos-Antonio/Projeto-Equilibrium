@@ -1,8 +1,10 @@
+import mysql.connector
+
 from app.services.db import get_db_connection
 
 def listar_pacientes_do_terapeuta(terapeuta_id):
     """
-    Busca os pacientes através do relacionamento entre as tabelas (INNER JOIN).
+    Lista somente os pacientes cadastrados pelo terapeuta autenticado.
     """
     conn = get_db_connection()
     if not conn:
@@ -10,12 +12,10 @@ def listar_pacientes_do_terapeuta(terapeuta_id):
         
     cursor = conn.cursor(dictionary=True)
     
-    # Fazemos a junção (JOIN) entre a tabela pacientes e a tabela associativa
     query = """
         SELECT p.id, p.nome, p.email, p.telefone, p.observacoes, p.criado_em 
         FROM pacientes p
-        INNER JOIN terapeuta_paciente tp ON p.id = tp.paciente_id
-        WHERE tp.terapeuta_id = %s
+        WHERE p.terapeuta_id = %s
         ORDER BY p.nome ASC
     """
     
@@ -29,7 +29,7 @@ def listar_pacientes_do_terapeuta(terapeuta_id):
 
 def criar_paciente(terapeuta_id, nome, email, telefone="", observacoes=""):
     """
-    Salva o paciente e cria o vínculo relacional com o terapeuta usando uma Transação.
+    Salva um paciente associado ao terapeuta que o cadastrou.
     """
     conn = get_db_connection()
     if not conn:
@@ -38,26 +38,16 @@ def criar_paciente(terapeuta_id, nome, email, telefone="", observacoes=""):
     cursor = conn.cursor()
     
     try:
-        # 1. Inserimos o paciente na tabela isolada de pacientes
         query_paciente = """
-            INSERT INTO pacientes (nome, email, telefone, observacoes) 
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO pacientes (terapeuta_id, nome, email, telefone, observacoes)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query_paciente, (nome, email, telefone, observacoes))
-        
-        # O MySQL nos devolve qual foi o ID gerado para esse novo paciente
-        paciente_id = cursor.lastrowid
-        
-        # 2. Criamos o vínculo do terapeuta com este paciente
-        query_vinculo = "INSERT INTO terapeuta_paciente (terapeuta_id, paciente_id) VALUES (%s, %s)"
-        cursor.execute(query_vinculo, (terapeuta_id, paciente_id))
-        
-        # 3. Confirmamos as duas operações no banco simultaneamente (Transação)
+        cursor.execute(query_paciente, (terapeuta_id, nome, email or None, telefone or None, observacoes or None))
+
         conn.commit()
         sucesso = True
         
     except Exception as e:
-        # Se der erro no vínculo, ele desfaz a criação do paciente (Rollback)
         conn.rollback()
         print(f"Erro ao inserir paciente: {e}")
         sucesso = False
@@ -67,3 +57,38 @@ def criar_paciente(terapeuta_id, nome, email, telefone="", observacoes=""):
         conn.close()
         
     return sucesso
+
+
+def buscar_paciente_do_terapeuta(terapeuta_id, paciente_id):
+    conn = get_db_connection()
+    if not conn:
+        return None
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT id, nome, email, telefone, observacoes FROM pacientes WHERE id = %s AND terapeuta_id = %s', (paciente_id, terapeuta_id))
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def atualizar_paciente(terapeuta_id, paciente_id, nome, email, telefone, observacoes):
+    conn = get_db_connection()
+    if not conn:
+        return False, 'Não foi possível conectar ao banco de dados.'
+    cursor = conn.cursor()
+    try:
+        cursor.execute('UPDATE pacientes SET nome = %s, email = %s, telefone = %s, observacoes = %s WHERE id = %s AND terapeuta_id = %s', (nome, email or None, telefone or None, observacoes or None, paciente_id, terapeuta_id))
+        if cursor.rowcount != 1:
+            conn.rollback()
+            return False, 'Paciente não encontrado.'
+        conn.commit()
+        return True, 'Dados do paciente atualizados com sucesso.'
+    except mysql.connector.Error as error:
+        conn.rollback()
+        if error.errno == 1062:
+            return False, 'Este telefone já está cadastrado para outro paciente.'
+        return False, 'Não foi possível atualizar o paciente.'
+    finally:
+        cursor.close()
+        conn.close()
