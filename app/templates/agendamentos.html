@@ -1,1 +1,172 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Agendamentos - Equilibrium</title><link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}"></head><body><header class="header"><div class="nav-links"><h2>Equilibrium</h2><a href="{{ url_for('dashboard.index') }}">Dashboard</a><a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a></div><a href="{{ url_for('auth.logout') }}" class="btn-logout">Sair</a></header><main class="container"><section class="card"><h3>Nova consulta</h3><div class="messages">{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="msg {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}</div><form method="post"><label for="paciente_id">Selecione o paciente</label><select name="paciente_id" id="paciente_id" required><option value="">-- Escolha um paciente --</option>{% for paciente in pacientes %}<option value="{{ paciente.id }}">{{ paciente.nome }}</option>{% else %}<option value="" disabled>Nenhum paciente cadastrado</option>{% endfor %}</select><label for="data_hora">Data e horário</label><input type="datetime-local" id="data_hora" name="data_hora" required><label for="duracao_minutos">Duração (minutos)</label><input type="number" id="duracao_minutos" name="duracao_minutos" min="5" max="240" value="20" required><label>Horário final previsto</label><div id="fim-previsto" class="fim-previsto">Preencha a data/hora e a duração.</div><label for="observacoes">Observações (opcional)</label><textarea id="observacoes" name="observacoes" rows="3"></textarea><button type="submit">Agendar e gerar link</button></form></section><section class="card"><h3>Agendamentos e histórico</h3><div class="table-wrap"><table><thead><tr><th>Paciente</th><th>Início / fim</th><th>Status</th><th>Acesso à sessão</th></tr></thead><tbody>{% for agendamento in agendamentos %}<tr class="{% if agendamento.iniciada_em %}sessao-iniciada{% endif %}"><td>{{ agendamento.paciente_nome }}</td><td>{{ agendamento.data_hora_inicio.strftime('%d/%m/%Y %H:%M') }}<br><small>até {{ agendamento.data_hora_fim.strftime('%H:%M') }}</small></td><td>{% if agendamento.status == 'CONCLUIDO' %}<span class="status-concluido">Concluída</span>{% elif agendamento.status == 'CANCELADO' %}<span class="status-cancelado">Cancelada</span>{% elif agendamento.iniciada_em %}<span class="indicador-sessao">Sessão iniciada</span>{% else %}Agendada{% endif %}</td><td><a href="{{ url_for('sessao.acessar_sessao', token=agendamento.token_acesso) }}" class="btn-link" target="_blank">Link do paciente</a></td></tr>{% else %}<tr><td colspan="4" class="empty">Nenhum agendamento encontrado.</td></tr>{% endfor %}</tbody></table></div></section></main><script>const inicio=document.querySelector('#data_hora'),duracao=document.querySelector('#duracao_minutos'),fimPrevisto=document.querySelector('#fim-previsto');function atualizarFimPrevisto(){if(!inicio.value||!duracao.value||Number(duracao.value)<=0){fimPrevisto.textContent='Preencha a data/hora e a duração.';return}const fim=new Date(inicio.value);fim.setMinutes(fim.getMinutes()+Number(duracao.value));fimPrevisto.textContent=fim.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}inicio.addEventListener('input',atualizarFimPrevisto);duracao.addEventListener('input',atualizarFimPrevisto);atualizarFimPrevisto();</script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Agenda • Equilibrium</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
+</head>
+
+<body class="app-page">
+    <header class="header">
+        <a class="brand" href="{{ url_for('dashboard.index') }}">
+            <span class="brand-mark">
+                <div class="brand-logo">
+                    <img src="{{ url_for('static', filename='img/icon.svg') }}" alt="icon">
+                </div>
+            </span>
+            <span>equilibrium<small>para terapeutas</small></span>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('dashboard.index') }}">Visão geral</a>
+            <a class="active" href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
+            <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
+            <a href="{{ url_for('admin.usuarios') }}">Administração</a>
+        </nav>
+        <div class="header-actions">
+            <span class="avatar">T</span>
+            <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="page-intro">
+            <div>
+                <p class="eyebrow">Organize com leveza</p>
+                <h1>Sua agenda.</h1>
+                <p>Reserve espaço para cada encontro e para você.</p>
+            </div>
+        </section>
+        <div class="messages">{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}
+            <div class="msg {{ category }}">{{ message }}
+
+            </div>{% endfor %}{% endwith %}
+        </div>
+        <section class="schedule-layout">
+            <aside class="card booking-form">
+                <p class="eyebrow">Novo encontro</p>
+                <h2>Agendar sessão</h2>
+                <form method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <label for="paciente_id">Paciente</label>
+                    <select name="paciente_id" id="paciente_id" required>
+                        <option value="">Selecione uma pessoa</option>{% for paciente in pacientes %}
+                        <option value="{{ paciente.id }}">{{ paciente.nome }}</option>{% else %}
+                        <option value="" disabled>Nenhum paciente cadastrado</option>{% endfor %}
+                    </select>
+                    <label for="data_hora">Data e horário</label>
+                    <input type="datetime-local" id="data_hora" name="data_hora" required>
+                    <label for="duracao_minutos">Duração</label>
+                    <select id="duracao_minutos" name="duracao_minutos" required>
+                        <option value="20">20 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="45">45 minutos</option>
+                        <option value="60">1 hora</option>
+                        <option value="90">1h30</option>
+                        <option value="120">2 horas</option>
+                    </select>
+                    <div id="fim-previsto" class="fim-previsto">Escolha o horário para ver o término.</div>
+                    <label for="observacoes">Nota para você <span>(opcional)</span></label>
+                    <textarea id="observacoes" name="observacoes" rows="3" placeholder="Intenção ou ponto de atenção..."></textarea>
+                    <button class="button button-primary form-submit" type="submit">Confirmar agendamento</button>
+                </form>
+            </aside>
+        <section class="card schedule-board">
+            <div class="card-heading">
+                <div>
+                    <p class="eyebrow">Visão geral</p>
+                    <h2>Agenda e histórico</h2>
+                </div>
+                <span class="period-pill">Todos os encontros</span>
+            </div>
+            <div class="agenda-hint"><span>
+
+            </span> Encontros iniciados ficam destacados para você acompanhar com tranquilidade.
+        </div>
+            <div class="table-wrap">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Paciente</th>
+                            <th>Data e horário</th>
+                            <th>Status</th>
+                            <th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for agendamento in agendamentos %}
+                                <tr class="{% if agendamento.iniciada_em %}sessao-iniciada{% endif %}">
+
+                                    <td>
+                                        <span class="patient-avatar small">
+                                            {{ agendamento.paciente_nome[0]|upper }}
+                                        </span>
+                                        <strong>{{ agendamento.paciente_nome }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ agendamento.data_hora_inicio.strftime('%d/%m/%Y') }}
+                                        <small>
+                                            {{ agendamento.data_hora_inicio.strftime('%H:%M') }}
+                                            —
+                                            {{ agendamento.data_hora_fim.strftime('%H:%M') }}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        {% if agendamento.status == 'CONCLUIDO' %}
+                                            <span class="status status-concluido">
+                                                Concluída
+                                            </span>
+
+                                        {% elif agendamento.status == 'CANCELADO' %}
+                                            <span class="status status-cancelado">
+                                                Cancelada
+                                            </span>
+
+                                        {% elif agendamento.status == 'NAO_COMPARECEU' %}
+                                            <span class="status status-nao-compareceu">
+                                                Não compareceu
+                                            </span>
+
+                                        {% elif agendamento.iniciada_em %}
+                                            <span class="status indicador-sessao">
+                                                Em sessão
+                                            </span>
+
+                                        {% else %}
+                                            <span class="status status-agendada">
+                                                Agendada
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if agendamento.status == 'AGENDADO' %}
+                                            <a
+                                                href="{{ url_for('sessao.acessar_sessao', token=agendamento.token_acesso) }}"
+                                                class="text-link"
+                                                target="_blank"
+                                            >
+                                                Abrir sessão →
+                                            </a>
+                                        {% endif %}
+                                    </td>
+
+                                </tr>
+
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="empty">
+                                        Ainda não há encontros agendados.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                    </tbody>
+                        </table>
+                    </div>
+                </section>
+            </section>
+        </main>
+<script>
+const inicio=document.querySelector('#data_hora'),duracao=document.querySelector('#duracao_minutos'),fimPrevisto=document.querySelector('#fim-previsto');function atualizarFimPrevisto(){if(!inicio.value||!duracao.value){fimPrevisto.textContent='Escolha o horário para ver o término.';return}const fim=new Date(inicio.value);fim.setMinutes(fim.getMinutes()+Number(duracao.value));fimPrevisto.textContent='Termina em '+fim.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}inicio.addEventListener('input',atualizarFimPrevisto);duracao.addEventListener('input',atualizarFimPrevisto);</script></body></html>

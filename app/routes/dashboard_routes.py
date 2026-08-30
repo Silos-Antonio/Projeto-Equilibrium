@@ -8,5 +8,5 @@ dashboard_bp = Blueprint('dashboard', __name__)
 @dashboard_bp.route('/dashboard')
 @login_required
 def index():
-    terapeuta_id = session.get('terapeuta_id')
+    terapeuta_id = session.get('usuario_id')
     return render_template('dashboard.html', terapeuta_id=terapeuta_id, dados=buscar_dados_dashboard(terapeuta_id))

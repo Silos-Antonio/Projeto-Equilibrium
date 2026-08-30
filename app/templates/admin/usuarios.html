@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Usuários • Equilibrium</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
+
+</head>
+
+<body class="app-page">
+
+    <header class="header">
+
+
+        <a class="brand" href="{{ url_for('dashboard.index') }}">
+            <span class="brand-mark">
+                <span class="brand-logo">
+                    <img src="{{ url_for('static', filename='img/icon.svg') }}" alt="icon">
+                </span>
+            </span>
+
+            <span>
+                equilibrium<small>para terapeutas</small>
+            </span>
+        </a>
+
+
+        <nav class="nav-links" aria-label="Navegação principal">
+
+            <a href="{{ url_for('dashboard.index') }}"> Visão geral</a>
+            <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
+            <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
+            <a class="active" href="{{ url_for('admin.usuarios') }}">Administração</a>
+
+        </nav>
+
+
+        <div class="header-actions">
+
+            <span class="avatar">A</span>
+            <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
+
+        </div>
+
+</header>
+
+<main class="page-shell">
+
+
+<section class="page-intro">
+
+    <div>
+
+        <p class="eyebrow">
+            Administração
+        </p>
+
+        <h1>
+            Usuários
+        </h1>
+
+        <p>
+            Gerencie os terapeutas que possuem acesso ao Equilibrium.
+        </p>
+
+    </div>
+
+
+    <a
+        class="button button-primary"
+        href="{{ url_for('auth.cadastro_terapeuta') }}"
+    >
+        + Novo terapeuta
+    </a>
+
+</section>
+
+
+<section class="card admin-users-card">
+
+    <div class="admin-card-heading">
+
+        <div>
+
+            <p class="eyebrow">
+                Acesso ao sistema
+            </p>
+
+            <h2>
+                Usuários cadastrados
+            </h2>
+
+        </div>
+
+
+        <a
+            class="admin-back-link"
+            href="{{ url_for('dashboard.index') }}"
+        >
+            ← Voltar ao dashboard
+        </a>
+
+    </div>
+
+
+    <div class="messages">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="msg {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+    </div>
+
+
+    <div class="admin-user-list">
+
+        <div class="admin-user-header">
+
+            <span>
+                Usuário
+            </span>
+
+            <span>
+                Perfil
+            </span>
+
+            <span>
+                Situação
+            </span>
+
+            <span>
+                Ações
+            </span>
+
+        </div>
+
+
+        {% for usuario in usuarios %}
+
+            <div class="admin-user-row">
+
+
+                <!-- Usuário -->
+
+                <div class="admin-user-info">
+
+                    <span class="admin-user-avatar">
+                        {{ usuario.nome[0]|upper }}
+                    </span>
+
+
+                    <div class="admin-user-details">
+
+                        <strong>
+                            {{ usuario.nome }}
+                        </strong>
+
+                        <span>
+                            {{ usuario.email }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Perfil -->
+
+                <div class="admin-user-role">
+
+                    {{ usuario.perfil }}
+
+                </div>
+
+
+                <!-- Situação -->
+
+                <div class="admin-user-status">
+
+                    {% if usuario.situacao == 'ATIVO' %}
+
+                        <span class="admin-status active">
+                            ATIVO
+                        </span>
+
+                    {% else %}
+
+                        <span class="admin-status inactive">
+                            INATIVO
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Ações -->
+
+                <div class="admin-user-actions">
+
+                    {% if usuario.perfil == 'TERAPEUTA' %}
+
+                        <a
+                            class="admin-action edit"
+                            href="{{ url_for(
+                                'admin.editar_usuario',
+                                usuario_id=usuario.id
+                            ) }}"
+                        >
+                            Editar
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'admin.alterar_situacao',
+                                usuario_id=usuario.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+
+                            {% if usuario.situacao == 'ATIVO' %}
+
+                                <button
+                                    type="submit"
+                                    class="admin-action deactivate"
+                                >
+                                    Inativar
+                                </button>
+
+                            {% else %}
+
+                                <button
+                                    type="submit"
+                                    class="admin-action activate"
+                                >
+                                    Ativar
+                                </button>
+
+                            {% endif %}
+
+                        </form>
+
+                    {% else %}
+
+                        <span class="admin-action-disabled">
+                            —
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="soft-empty">
+                Nenhum usuário encontrado.
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+</main>
+
+</body>
+
+</html>

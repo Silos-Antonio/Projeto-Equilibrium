@@ -1,4 +1,6 @@
 from flask import Flask, jsonify
+from app.extensions import limiter
+from app.extensions import csrf
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -11,15 +13,28 @@ from app.routes.dashboard_routes import dashboard_bp
 from app.routes.paciente_routes import paciente_bp
 from app.routes.agendamento_routes import agendamento_bp
 from app.routes.sessao_routes import sessao_bp
+from app.routes.admin_routes import admin_bp
+
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key')
+    
+    secret_key = os.getenv('SECRET_KEY')
+
+    if not secret_key:
+        raise RuntimeError('SECRET_KEY não configurada.')
+    
+    app.config['SECRET_KEY'] = secret_key
+
+    limiter.init_app(app)
+    csrf.init_app(app)
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(paciente_bp)
     app.register_blueprint(agendamento_bp)
     app.register_blueprint(sessao_bp)
+    app.register_blueprint(admin_bp)
     
 
     @app.route('/health', methods=['GET'])
@@ -33,7 +48,6 @@ def create_app():
         return jsonify({
             "status": "sucesso",
             "api": "online",
-            "database": db_status
         }), 200
     
     return app

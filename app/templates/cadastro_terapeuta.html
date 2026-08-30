@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Cadastro de Terapeuta - Equilibrium</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/app.css') }}"
+>
+
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='img/icon.svg') }}"
+>
+
+
+</head>
+
+<body class="login-page">
+
+
+<main class="login-container">
+
+    <div class="logo">
+        <img
+            src="{{ url_for('static', filename='img/logo.png') }}"
+            alt="logo-equilibrium"
+        >
+    </div>
+
+    <h1>Cadastro de Terapeuta</h1>
+
+    <div class="messages">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="msg {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+    </div>
+
+    <form
+        method="post"
+        action="{{ url_for('auth.cadastro_terapeuta') }}"
+    >
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <label for="nome">Nome</label>
+
+        <input
+            id="nome"
+            name="nome"
+            type="text"
+            required
+            maxlength="100"
+            autocomplete="name"
+            placeholder="Nome completo"
+        >
+
+
+        <label for="email">E-mail</label>
+
+        <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            maxlength="100"
+            autocomplete="email"
+            placeholder="seu@email.com"
+        >
+
+
+        <label for="telefone">Telefone</label>
+
+        <input
+            id="telefone"
+            name="telefone"
+            type="tel"
+            required
+            maxlength="20"
+            autocomplete="tel"
+            placeholder="(00) 00000-0000"
+        >
+
+
+        <label for="senha">Senha</label>
+
+        <input
+            id="senha"
+            name="senha"
+            type="password"
+            required
+            autocomplete="new-password"
+            placeholder="••••••••"
+        >
+
+
+        <button type="submit">
+            <span class="text">Cadastrar terapeuta</span>
+        </button>
+
+    </form>
+
+</main>
+
+
+</body>
+
+</html>

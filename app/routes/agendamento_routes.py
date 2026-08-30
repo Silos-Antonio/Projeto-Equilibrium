@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
@@ -5,6 +6,7 @@ from flask import Blueprint, flash, redirect, render_template, request, session,
 from app.services.agendamento_service import criar_agendamento, listar_agendamentos_do_terapeuta
 from app.services.paciente_service import listar_pacientes_do_terapeuta
 from app.utils.decorators import login_required
+from app.services.sessao_service import encerrar_sessoes_expiradas
 
 agendamento_bp = Blueprint('agendamento', __name__)
 
@@ -12,7 +14,7 @@ agendamento_bp = Blueprint('agendamento', __name__)
 @agendamento_bp.route('/agendamentos', methods=['GET', 'POST'])
 @login_required
 def gerir_agendamentos():
-    terapeuta_id = session['terapeuta_id']
+    terapeuta_id = session['usuario_id']
 
     if request.method == 'POST':
         try:
@@ -32,6 +34,8 @@ def gerir_agendamentos():
             else:
                 flash(resultado, 'error')
         return redirect(url_for('agendamento.gerir_agendamentos'))
+
+    encerrar_sessoes_expiradas(terapeuta_id)
 
     return render_template(
         'agendamentos.html',

@@ -1,1 +1,538 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sessão Equilibrium</title><link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}"></head><body class="session-page"><main class="session-box">{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<p class="erro">{{ message }}</p>{% endfor %}{% endwith %}{% if status == 'erro' %}<h1 class="erro">Link indisponível</h1><p>{{ mensagem }}</p>{% elif status == 'aguardando' %}<h1>Olá, {{ sessao.paciente_nome }}.</h1><p class="muted">Sua sessão ainda não começou. Volte no horário agendado.</p>{% elif status == 'pronta' %}<h1>Olá, {{ sessao.paciente_nome }}.</h1><p class="muted">Quando estiver pronto(a), inicie sua sessão. O cronômetro só começará após esse clique.</p><form id="form-iniciar" method="post" action="{{ url_for('sessao.iniciar', token=sessao.token_acesso) }}"><button id="botao-iniciar" type="submit">Iniciar sessão</button></form><p id="erro-inicio" class="erro" hidden></p><div id="area-ativa" hidden><p class="muted">Tempo restante</p><div id="timer" aria-live="polite">--:--</div></div><audio id="musica" loop preload="metadata"><source src="{{ url_for('sessao.audio_meditacao') }}" type="audio/mpeg"></audio><script>const audio=document.querySelector('#musica'),form=document.querySelector('#form-iniciar'),botao=document.querySelector('#botao-iniciar'),erro=document.querySelector('#erro-inicio');let intervalo;function iniciarTimer(fimTimestamp){const fim=new Date(fimTimestamp);function atualizarTimer(){const total=Math.max(0,Math.floor((fim-new Date())/1000));document.querySelector('#timer').textContent=`${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;if(!total){clearInterval(intervalo);audio.pause();window.location.reload()}}atualizarTimer();intervalo=setInterval(atualizarTimer,1000)}form.addEventListener('submit',async evento=>{evento.preventDefault();botao.disabled=true;erro.hidden=true;const tentativaDeAudio=audio.play();try{const resposta=await fetch(form.action,{method:'POST',headers:{Accept:'application/json'}}),dados=await resposta.json();if(!resposta.ok)throw new Error(dados.erro);await tentativaDeAudio.catch(()=>{throw new Error('Não foi possível iniciar o áudio.')});form.hidden=true;document.querySelector('#area-ativa').hidden=false;iniciarTimer(dados.fim_timestamp)}catch(error){audio.pause();botao.disabled=false;erro.textContent=error.message;erro.hidden=false}});</script>{% elif status == 'encerrada' %}<h1>Sessão encerrada</h1><p class="muted">Obrigado por reservar este momento para você.</p>{% else %}<h1>Sua sessão está em andamento</h1><p class="muted">Tempo restante</p><div id="timer" aria-live="polite">--:--</div><p class="muted">Respire com calma e use este tempo para você.</p><audio id="musica" loop autoplay preload="metadata"><source src="{{ url_for('sessao.audio_meditacao') }}" type="audio/mpeg"></audio><script>const audio=document.querySelector('#musica'),fim=new Date({{ sessao.data_hora_fim_real.timestamp()|int }}*1000);function atualizarTimer(){const total=Math.max(0,Math.floor((fim-new Date())/1000)),minutos=String(Math.floor(total/60)).padStart(2,'0'),segundos=String(total%60).padStart(2,'0');document.querySelector('#timer').textContent=`${minutos}:${segundos}`;if(!total){audio.pause();window.location.reload()}}atualizarTimer();setInterval(atualizarTimer,1000);</script>{% endif %}</main></body></html>
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Sessão • Equilibrium</title>
+
+<link
+    rel="icon"
+    type="image/svg+xml"
+    href="{{ url_for('static', filename='img/icon.svg') }}"
+>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/app.css') }}"
+>
+
+
+</head>
+
+<body class="session-page">
+
+
+<main class="session-box">
+
+    <!-- ============================== -->
+    <!-- MARCA -->
+    <!-- ============================== -->
+
+    <a
+        class="session-brand"
+        href="#"
+    >
+        <span class="brand-mark">
+            e
+        </span>
+
+        <span>
+            equilibrium
+        </span>
+    </a>
+
+
+    <!-- ============================== -->
+    <!-- MENSAGENS FLASH -->
+    <!-- ============================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <p class="erro">
+                {{ message }}
+            </p>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    <!-- ============================== -->
+    <!-- LINK INVÁLIDO -->
+    <!-- ============================== -->
+
+    {% if status == 'erro' %}
+
+        <span class="session-orb muted-orb">
+            !
+        </span>
+
+        <p class="eyebrow">
+            Link indisponível
+        </p>
+
+        <h1>
+            Este momento não está disponível.
+        </h1>
+
+        <p class="muted">
+            {{ mensagem }}
+        </p>
+
+
+    <!-- ============================== -->
+    <!-- AGUARDANDO HORÁRIO -->
+    <!-- ============================== -->
+
+    {% elif status == 'aguardando' %}
+
+        <span class="session-orb">
+            ⌁
+        </span>
+
+        <p class="eyebrow">
+            Seu momento de pausa
+        </p>
+
+        <h1>
+            Olá, {{ sessao.paciente_nome }}.
+        </h1>
+
+        <p class="muted">
+            Sua sessão ainda não começou.
+            Volte no horário agendado e permita-se
+            chegar com calma.
+        </p>
+
+
+    <!-- ============================== -->
+    <!-- SESSÃO PRONTA -->
+    <!-- ============================== -->
+
+    {% elif status == 'pronta' %}
+
+        <span class="session-orb">
+            ⌁
+        </span>
+
+        <p class="eyebrow">
+            Tudo preparado
+        </p>
+
+        <h1>
+            Olá, {{ sessao.paciente_nome }}.
+        </h1>
+
+        <p class="muted">
+            Encontre uma posição confortável.
+            Quando estiver pronto(a), comece seu momento.
+        </p>
+
+
+        <form
+            id="form-iniciar"
+            method="post"
+            action="{{ url_for(
+                'sessao.iniciar',
+                token=sessao.token_acesso
+            ) }}"
+        >
+
+            <input
+                type="hidden"
+                id="csrf_token"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <button
+                id="botao-iniciar"
+                class="button button-primary session-cta"
+                type="submit"
+            >
+                Iniciar minha sessão
+
+                <span>
+                    →
+                </span>
+            </button>
+
+        </form>
+
+
+        <p
+            id="erro-inicio"
+            class="erro"
+            hidden
+        ></p>
+
+
+        <div
+            id="area-ativa"
+            hidden
+        >
+
+            <p class="timer-label">
+                Tempo restante
+            </p>
+
+            <div
+                id="timer"
+                aria-live="polite"
+            >
+                --:--
+            </div>
+
+            <p class="breath-note">
+                Inspire devagar. Expire com gentileza.
+            </p>
+
+        </div>
+
+
+        <audio
+            id="musica"
+            loop
+            preload="metadata"
+        >
+            <source
+                src="{{ url_for('sessao.audio_meditacao') }}"
+                type="audio/mpeg"
+            >
+        </audio>
+
+
+    <!-- ============================== -->
+    <!-- SESSÃO ATIVA -->
+    <!-- ============================== -->
+
+    {% elif status == 'ativa' %}
+
+        <span class="session-orb">
+            ⌁
+        </span>
+
+        <p class="eyebrow">
+            Momento em andamento
+        </p>
+
+        <h1>
+            Olá, {{ sessao.paciente_nome }}.
+        </h1>
+
+        <p class="muted">
+            Permita-se permanecer neste momento.
+            Respire com calma e aproveite o seu tempo.
+        </p>
+
+
+        <div id="area-ativa">
+
+            <p class="timer-label">
+                Tempo restante
+            </p>
+
+            <div
+                id="timer"
+                aria-live="polite"
+            >
+                --:--
+            </div>
+
+            <p class="breath-note">
+                Inspire devagar. Expire com gentileza.
+            </p>
+
+        </div>
+
+
+        <audio
+            id="musica"
+            loop
+            preload="metadata"
+        >
+            <source
+                src="{{ url_for('sessao.audio_meditacao') }}"
+                type="audio/mpeg"
+            >
+        </audio>
+
+
+    <!-- ============================== -->
+    <!-- SESSÃO ENCERRADA -->
+    <!-- ============================== -->
+
+    {% elif status == 'encerrada' %}
+
+        <span class="session-orb">
+            ✓
+        </span>
+
+        <p class="eyebrow">
+            Sessão concluída
+        </p>
+
+        <h1>
+            Sua sessão chegou ao fim.
+        </h1>
+
+        <p class="muted">
+            Obrigado por reservar este tempo para você. <br>
+            Que você siga o seu dia
+            com leveza e plenitude.
+        </p>
+
+    {% endif %}
+
+
+</main>
+
+
+<!-- ======================================== -->
+<!-- JAVASCRIPT -->
+<!-- ======================================== -->
+
+{% if status == 'pronta' or status == 'ativa' %}
+
+    <script>
+
+    const statusSessao = "{{ status }}";
+
+    const audio = document.querySelector('#musica');
+
+    const form = document.querySelector('#form-iniciar');
+
+    const botao = document.querySelector('#botao-iniciar');
+
+    const erro = document.querySelector('#erro-inicio');
+
+    const timer = document.querySelector('#timer');
+
+    const areaAtiva = document.querySelector('#area-ativa');
+
+    let intervalo = null;
+
+
+    // ==================================
+    // TIMER
+    // ==================================
+
+    function iniciarTimer(fimTimestamp) {
+
+        const fim = new Date(fimTimestamp);
+
+
+        function atualizarTimer() {
+
+            const agora = new Date();
+
+            const total = Math.max(
+                0,
+                Math.floor((fim - agora) / 1000)
+            );
+
+
+            const minutos = String(
+                Math.floor(total / 60)
+            ).padStart(2, '0');
+
+
+            const segundos = String(
+                total % 60
+            ).padStart(2, '0');
+
+
+            if (timer) {
+
+                timer.textContent =
+                    `${minutos}:${segundos}`;
+
+            }
+
+
+            if (total === 0) {
+
+                clearInterval(intervalo);
+
+                if (audio) {
+                    audio.pause();
+                }
+
+                window.location.reload();
+
+            }
+
+        }
+
+
+        atualizarTimer();
+
+        intervalo = setInterval(
+            atualizarTimer,
+            1000
+        );
+
+    }
+
+
+    // ==================================
+    // INICIAR SESSÃO
+    // ==================================
+
+    if (statusSessao === 'pronta') {
+
+        const csrfToken =
+            document.querySelector(
+                '#csrf_token'
+            ).value;
+
+
+        form.addEventListener(
+            'submit',
+            async (evento) => {
+
+                evento.preventDefault();
+
+                botao.disabled = true;
+
+                erro.hidden = true;
+
+
+                /*
+                 * Tenta iniciar o áudio imediatamente,
+                 * aproveitando a interação do usuário
+                 * com o botão.
+                 */
+
+                const tentativaDeAudio =
+                    audio.play();
+
+
+                try {
+
+                    const resposta =
+                        await fetch(
+                            form.action,
+                            {
+                                method: 'POST',
+
+                                headers: {
+                                    'Accept':
+                                        'application/json',
+
+                                    'X-CSRFToken':
+                                        csrfToken
+                                }
+                            }
+                        );
+
+
+                    const dados =
+                        await resposta.json();
+
+
+                    if (!resposta.ok) {
+
+                        throw new Error(
+                            dados.erro ||
+                            'Não foi possível iniciar a sessão.'
+                        );
+
+                    }
+
+
+                    /*
+                     * Garante que o áudio realmente
+                     * conseguiu iniciar.
+                     */
+
+                    await tentativaDeAudio.catch(
+                        () => {
+
+                            throw new Error(
+                                'Não foi possível iniciar o áudio.'
+                            );
+
+                        }
+                    );
+
+
+                    /*
+                     * Esconde o formulário.
+                     */
+
+                    form.hidden = true;
+
+
+                    /*
+                     * Mostra a área do contador.
+                     */
+
+                    areaAtiva.hidden = false;
+
+
+                    /*
+                     * Inicia o contador usando
+                     * o horário retornado pelo servidor.
+                     */
+
+                    iniciarTimer(
+                        dados.fim_timestamp
+                    );
+
+                }
+
+
+                catch (error) {
+
+                    if (audio) {
+                        audio.pause();
+                    }
+
+
+                    botao.disabled = false;
+
+                    erro.textContent =
+                        error.message;
+
+                    erro.hidden = false;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ==================================
+    // SESSÃO JÁ ATIVA
+    // ==================================
+
+    if (statusSessao === 'ativa') {
+
+        iniciarTimer(
+            "{{ sessao.data_hora_fim_real.timestamp() * 1000 }}"
+        );
+
+    }
+
+</script>
+
+
+{% endif %}
+
+
+</body>
+
+</html>
