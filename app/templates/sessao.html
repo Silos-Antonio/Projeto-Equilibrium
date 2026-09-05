@@ -1,538 +1,602 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>Sessão • Equilibrium</title>
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="{{ url_for('static', filename='img/icon.svg') }}"
+    />
 
-<title>Sessão • Equilibrium</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/app.css') }}"
+    />
+  </head>
 
-<link
-    rel="icon"
-    type="image/svg+xml"
-    href="{{ url_for('static', filename='img/icon.svg') }}"
->
+  <body class="session-page">
+    <main class="session-box" {% if status == 'ativa' %}pulse-chakra{% endif %}">
+      <!-- ============================== -->
+      <!-- MARCA -->
+      <!-- ============================== -->
 
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/app.css') }}"
->
-
-
-</head>
-
-<body class="session-page">
-
-
-<main class="session-box">
-
-    <!-- ============================== -->
-    <!-- MARCA -->
-    <!-- ============================== -->
-
-    <a
-        class="session-brand"
-        href="#"
-    >
-        <span class="brand-mark">
-            e
-        </span>
-
-        <span>
-            equilibrium
-        </span>
-    </a>
-
-
-    <!-- ============================== -->
-    <!-- MENSAGENS FLASH -->
-    <!-- ============================== -->
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-
-        {% for category, message in messages %}
-
-            <p class="erro">
-                {{ message }}
-            </p>
-
-        {% endfor %}
-
-    {% endwith %}
-
-
-    <!-- ============================== -->
-    <!-- LINK INVÁLIDO -->
-    <!-- ============================== -->
-
-    {% if status == 'erro' %}
-
-        <span class="session-orb muted-orb">
-            !
-        </span>
-
-        <p class="eyebrow">
-            Link indisponível
-        </p>
-
-        <h1>
-            Este momento não está disponível.
-        </h1>
-
-        <p class="muted">
-            {{ mensagem }}
-        </p>
-
-
-    <!-- ============================== -->
-    <!-- AGUARDANDO HORÁRIO -->
-    <!-- ============================== -->
-
-    {% elif status == 'aguardando' %}
-
-        <span class="session-orb">
-            ⌁
-        </span>
-
-        <p class="eyebrow">
-            Seu momento de pausa
-        </p>
-
-        <h1>
-            Olá, {{ sessao.paciente_nome }}.
-        </h1>
-
-        <p class="muted">
-            Sua sessão ainda não começou.
-            Volte no horário agendado e permita-se
-            chegar com calma.
-        </p>
-
-
-    <!-- ============================== -->
-    <!-- SESSÃO PRONTA -->
-    <!-- ============================== -->
-
-    {% elif status == 'pronta' %}
-
-        <span class="session-orb">
-            ⌁
-        </span>
-
-        <p class="eyebrow">
-            Tudo preparado
-        </p>
-
-        <h1>
-            Olá, {{ sessao.paciente_nome }}.
-        </h1>
-
-        <p class="muted">
-            Encontre uma posição confortável.
-            Quando estiver pronto(a), comece seu momento.
-        </p>
-
-
-        <form
-            id="form-iniciar"
-            method="post"
-            action="{{ url_for(
-                'sessao.iniciar',
-                token=sessao.token_acesso
-            ) }}"
-        >
-
-            <input
-                type="hidden"
-                id="csrf_token"
-                name="csrf_token"
-                value="{{ csrf_token() }}"
+      <a class="brand" href="{{ url_for('dashboard.index') }}">
+        <span class="brand-mark"> 
+            <div class="brand-logo">
+                <img
+                src="{{ url_for('static', filename='img/icon.svg') }}"
+                alt="icon"
             >
-
-            <button
-                id="botao-iniciar"
-                class="button button-primary session-cta"
-                type="submit"
-            >
-                Iniciar minha sessão
-
-                <span>
-                    →
-                </span>
-            </button>
-
-        </form>
-
-
-        <p
-            id="erro-inicio"
-            class="erro"
-            hidden
-        ></p>
-
-
-        <div
-            id="area-ativa"
-            hidden
-        >
-
-            <p class="timer-label">
-                Tempo restante
-            </p>
-
-            <div
-                id="timer"
-                aria-live="polite"
-            >
-                --:--
             </div>
+         </span>
 
-            <p class="breath-note">
-                Inspire devagar. Expire com gentileza.
-            </p>
+        <span> equilibrium </span>
+      </a>
 
+      <!-- ============================== -->
+      <!-- MENSAGENS FLASH -->
+      <!-- ============================== -->
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% for
+      category, message in messages %}
+
+      <p class="erro">{{ message }}</p>
+
+      {% endfor %} {% endwith %}
+
+      <!-- ============================== -->
+      <!-- LINK INVÁLIDO -->
+      <!-- ============================== -->
+
+      {% if status == 'erro' %}
+
+      <span class="session-orb muted-orb"> ! </span>
+
+      <p class="eyebrow">Link indisponível</p>
+
+      <h1>Este momento não está disponível.</h1>
+
+      <p class="muted">{{ mensagem }}</p>
+
+      <!-- ============================== -->
+      <!-- AGUARDANDO HORÁRIO -->
+      <!-- ============================== -->
+
+      {% elif status == 'aguardando' %}
+
+      <span class="session-crystal">
+        
+      </span>
+
+      <p class="eyebrow">Seu momento de pausa</p>
+
+      <h1>Olá, {{ sessao.paciente_nome }}.</h1>
+
+      <p class="muted">
+        Sua sessão ainda não começou. Volte no horário agendado e permita-se
+        chegar com calma.
+      </p>
+
+      <!-- ============================== -->
+      <!-- SESSÃO PRONTA -->
+      <!-- ============================== -->
+
+      {% elif status == 'pronta' %}
+
+      <p class="eyebrow">Tudo preparado</p>
+
+      <h1>Olá, {{ sessao.paciente_nome }}.</h1>
+
+      <p class="muted">
+        Encontre uma posição confortável. Quando estiver pronto(a), comece seu
+        momento.
+      </p>
+
+      <form
+        id="form-iniciar"
+        method="post"
+        action="{{ url_for('sessao.iniciar', token=sessao.token_acesso) }}"
+      >
+        <input
+          type="hidden"
+          id="csrf_token"
+          name="csrf_token"
+          value="{{ csrf_token() }}"
+        />
+
+        <button
+          id="botao-iniciar"
+          class="button button-primary session-cta"
+          type="submit"
+        >
+          Iniciar minha sessão
+
+          <span> → </span>
+        </button>
+      </form>
+
+      <p id="erro-inicio" class="erro" hidden></p>
+
+      <!-- ============================== -->
+      <!-- ÁREA ATIVA (Aparece ao clicar) -->
+      <!-- ============================== -->
+
+      <div id="area-ativa" hidden>
+        <div class="session-crystal">
+          <img src="{{ url_for('static', filename='img/crystal-raiz.png') }}" class="crystal-img" alt="Chakra Raiz">
+          <img src="{{ url_for('static', filename='img/crystal-sacro.png') }}" class="crystal-img" alt="Chakra Sacro">
+          <img src="{{ url_for('static', filename='img/crystal-plexo.png') }}" class="crystal-img" alt="Chakra Plexo Solar">
+          <img src="{{ url_for('static', filename='img/crystal-cardiaco.png') }}" class="crystal-img" alt="Chakra Cardíaco">
+          <img src="{{ url_for('static', filename='img/crystal-laringeo.png') }}" class="crystal-img" alt="Chakra Laríngeo">
+          <img src="{{ url_for('static', filename='img/crystal-frontal.png') }}" class="crystal-img" alt="Chakra Frontal">
+          <img src="{{ url_for('static', filename='img/crystal-coronario.png') }}" class="crystal-img" alt="Chakra Coronário">
         </div>
 
+        <p class="timer-label">Tempo restante</p>
 
-        <audio
-            id="musica"
-            loop
-            preload="metadata"
-        >
-            <source
-                src="{{ url_for('sessao.audio_meditacao') }}"
-                type="audio/mpeg"
-            >
-        </audio>
+        <div id="timer" aria-live="polite">--:--</div>
 
+        <p class="breath-note">Inspire devagar. Expire com gentileza.</p>
+      </div>
 
-    <!-- ============================== -->
-    <!-- SESSÃO ATIVA -->
-    <!-- ============================== -->
+      <audio id="musica" loop preload="metadata">
+        <source
+          src="{{ url_for('sessao.audio_meditacao') }}"
+          type="audio/mpeg"
+        />
+      </audio>
 
-    {% elif status == 'ativa' %}
+      <!-- ============================== -->
+      <!-- SESSÃO ATIVA -->
+      <!-- ============================== -->
 
-        <span class="session-orb">
-            ⌁
-        </span>
+      {% elif status == 'ativa' %}
 
-        <p class="eyebrow">
-            Momento em andamento
-        </p>
+      <p class="eyebrow">Momento em andamento</p>
 
-        <h1>
-            Olá, {{ sessao.paciente_nome }}.
-        </h1>
+      <h1>Olá, {{ sessao.paciente_nome }}.</h1>
 
-        <p class="muted">
-            Permita-se permanecer neste momento.
-            Respire com calma e aproveite o seu tempo.
-        </p>
+      <p class="muted">
+        Permita-se permanecer neste momento.
+      </p>
 
 
-        <div id="area-ativa">
+      <div id="area-ativa">
 
-            <p class="timer-label">
-                Tempo restante
-            </p>
-
-            <div
-                id="timer"
-                aria-live="polite"
-            >
-                --:--
-            </div>
-
-            <p class="breath-note">
-                Inspire devagar. Expire com gentileza.
-            </p>
-
+        <div class="session-crystal">
+          <img src="{{ url_for('static', filename='img/crystal-raiz.png') }}" class="crystal-img" alt="Chakra Raiz">
+          <img src="{{ url_for('static', filename='img/crystal-sacro.png') }}" class="crystal-img" alt="Chakra Sacro">
+          <img src="{{ url_for('static', filename='img/crystal-plexo.png') }}" class="crystal-img" alt="Chakra Plexo Solar">
+          <img src="{{ url_for('static', filename='img/crystal-cardiaco.png') }}" class="crystal-img" alt="Chakra Cardíaco">
+          <img src="{{ url_for('static', filename='img/crystal-laringeo.png') }}" class="crystal-img" alt="Chakra Laríngeo">
+          <img src="{{ url_for('static', filename='img/crystal-frontal.png') }}" class="crystal-img" alt="Chakra Frontal">
+          <img src="{{ url_for('static', filename='img/crystal-coronario.png') }}" class="crystal-img" alt="Chakra Coronário">
         </div>
 
+        <p class="timer-label">Tempo restante</p>
 
-        <audio
-            id="musica"
-            loop
-            preload="metadata"
-        >
-            <source
-                src="{{ url_for('sessao.audio_meditacao') }}"
-                type="audio/mpeg"
-            >
-        </audio>
+        <div id="timer" aria-live="polite">--:--</div>
 
+        <p class="breath-note">Inspire devagar. Expire com gentileza.</p>
+      </div>
 
-    <!-- ============================== -->
-    <!-- SESSÃO ENCERRADA -->
-    <!-- ============================== -->
+        <button
+            id="botao-musica"
+            class="button button-secondary"
+            type="button"
+            hidden>
+            ▶ Retomar música
+        </button>
 
-    {% elif status == 'encerrada' %}
+      <audio id="musica" loop preload="metadata">
+        <source
+          src="{{ url_for('sessao.audio_meditacao') }}"
+          type="audio/mpeg"
+        />
+      </audio>
 
-        <span class="session-orb">
-            ✓
-        </span>
+      <!-- ============================== -->
+      <!-- SESSÃO ENCERRADA -->
+      <!-- ============================== -->
 
-        <p class="eyebrow">
-            Sessão concluída
-        </p>
+      {% elif status == 'encerrada' %}
 
-        <h1>
-            Sua sessão chegou ao fim.
-        </h1>
+      <span class="session-orb"> ✓ </span>
 
-        <p class="muted">
-            Obrigado por reservar este tempo para você. <br>
-            Que você siga o seu dia
-            com leveza e plenitude.
-        </p>
+      <p class="eyebrow">Sessão concluída</p>
 
-    {% endif %}
+      <h1>Sua sessão chegou ao fim.</h1>
 
+      <p class="muted">
+        Parabéns por reservar este tempo para você.
+        <br />
+        Que você siga o seu dia com leveza e plenitude.
+      </p>
 
-</main>
+      {% endif %}
+    </main>
 
+    <!-- ======================================== -->
 
-<!-- ======================================== -->
-<!-- JAVASCRIPT -->
-<!-- ======================================== -->
+    <!-- JAVASCRIPT -->
 
-{% if status == 'pronta' or status == 'ativa' %}
+    <!-- ======================================== -->
+
+    {% if status == 'pronta' or status == 'ativa' %}
 
     <script>
 
-    const statusSessao = "{{ status }}";
+      const statusSessao = "{{ status }}";
 
-    const audio = document.querySelector('#musica');
+      const CHAVE_MUSICA =
+    'equilibrium_musica_ativa';
 
-    const form = document.querySelector('#form-iniciar');
+      const audio =
+          document.querySelector('#musica');
 
-    const botao = document.querySelector('#botao-iniciar');
+      const form =
+          document.querySelector('#form-iniciar');
 
-    const erro = document.querySelector('#erro-inicio');
+      const botao =
+          document.querySelector('#botao-iniciar');
 
-    const timer = document.querySelector('#timer');
+      const erro =
+          document.querySelector('#erro-inicio');
 
-    const areaAtiva = document.querySelector('#area-ativa');
+      const timer =
+          document.querySelector('#timer');
 
-    let intervalo = null;
+      const areaAtiva =
+          document.querySelector('#area-ativa');
+
+        const botaoMusica =
+    document.querySelector('#botao-musica');
+
+      let intervalo = null;
 
 
     // ==================================
-    // TIMER
-    // ==================================
+// MÚSICA
+// ==================================
 
-    function iniciarTimer(fimTimestamp) {
+async function iniciarMusica() {
 
-        const fim = new Date(fimTimestamp);
+    if (!audio) {
+        return;
+    }
+
+    try {
+
+        await audio.play();
+
+        sessionStorage.setItem(
+            CHAVE_MUSICA,
+            'true'
+        );
+
+        if (botaoMusica) {
+
+            botaoMusica.hidden = true;
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            'O navegador bloqueou a reprodução automática.',
+            error
+        );
+
+        if (botaoMusica) {
+
+            botaoMusica.hidden = false;
+
+        }
+
+    }
+
+}
 
 
-        function atualizarTimer() {
+function pausarMusica() {
 
-            const agora = new Date();
+    if (!audio) {
+        return;
+    }
 
-            const total = Math.max(
-                0,
-                Math.floor((fim - agora) / 1000)
-            );
+    audio.pause();
 
+    sessionStorage.removeItem(
+        CHAVE_MUSICA
+    );
 
-            const minutos = String(
-                Math.floor(total / 60)
-            ).padStart(2, '0');
-
-
-            const segundos = String(
-                total % 60
-            ).padStart(2, '0');
+}
 
 
-            if (timer) {
+async function restaurarMusica() {
 
-                timer.textContent =
-                    `${minutos}:${segundos}`;
+    const musicaEstavaAtiva =
+        sessionStorage.getItem(
+            CHAVE_MUSICA
+        ) === 'true';
 
-            }
+
+    if (!musicaEstavaAtiva) {
+        return;
+    }
 
 
-            if (total === 0) {
+    try {
 
-                clearInterval(intervalo);
+        await audio.play();
 
-                if (audio) {
-                    audio.pause();
+        if (botaoMusica) {
+
+            botaoMusica.hidden = true;
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            'A reprodução automática foi bloqueada.',
+            error
+        );
+
+        if (botaoMusica) {
+
+            botaoMusica.hidden = false;
+
+        }
+
+    }
+
+}
+
+      // ==================================
+      // TIMER
+      // ==================================
+
+      function iniciarTimer(fimTimestamp) {
+
+          const fim =
+              new Date(fimTimestamp);
+
+
+          function atualizarTimer() {
+
+              const agora =
+                  new Date();
+
+
+              const total =
+                  Math.max(
+                      0,
+                      Math.floor(
+                          (fim - agora) / 1000
+                      )
+                  );
+
+
+              const minutos =
+                  String(
+                      Math.floor(total / 60)
+                  ).padStart(2, '0');
+
+
+              const segundos =
+                  String(
+                      total % 60
+                  ).padStart(2, '0');
+
+
+              if (timer) {
+
+                  timer.textContent =
+                      `${minutos}:${segundos}`;
+
+              }
+
+
+              if (total === 0) {
+
+                  clearInterval(intervalo);
+
+
+                  pausarMusica();
+
+
+                  window.location.reload();
+
+              }
+
+          }
+
+
+          atualizarTimer();
+
+
+          intervalo =
+              setInterval(
+                  atualizarTimer,
+                  1000
+              );
+
+      }
+
+
+      // ==================================
+      // INICIAR SESSÃO
+      // ==================================
+
+      if (statusSessao === 'pronta') {
+
+          const csrfToken =
+              document.querySelector(
+                  '#csrf_token'
+              ).value;
+
+
+          form.addEventListener(
+              'submit',
+              async (evento) => {
+
+                  evento.preventDefault();
+
+
+                  botao.disabled = true;
+
+                  erro.hidden = true;
+
+
+                  /*
+                   * Tenta iniciar o áudio imediatamente,
+                   * aproveitando a interação do usuário
+                   * com o botão.
+                   */
+
+                    const tentativaDeAudio =
+                        iniciarMusica();
+
+
+                  try {
+
+                      const resposta =
+                          await fetch(
+                              form.action,
+                              {
+                                  method: 'POST',
+
+                                  headers: {
+                                      'Accept':
+                                          'application/json',
+
+                                      'X-CSRFToken':
+                                          csrfToken
+                                  }
+                              }
+                          );
+
+
+                      const dados =
+                          await resposta.json();
+
+
+                      if (!resposta.ok) {
+
+                          throw new Error(
+                              dados.erro ||
+                              'Não foi possível iniciar a sessão.'
+                          );
+
+                      }
+
+
+                      /*
+                       * Garante que o áudio realmente
+                       * conseguiu iniciar.
+                       */
+
+                      await tentativaDeAudio;
+
+
+                      /*
+                       * Esconde o formulário.
+                       */
+
+                      form.hidden = true;
+
+
+                      /*
+                       * Mostra a área do contador.
+                       */
+
+                      areaAtiva.hidden = false;
+
+                      /*
+                       * Ativa a pulsação suave dos chakras no box-shadow
+                       */
+                      document.querySelector('.session-box').classList.add('pulse-chakra');
+
+
+                      /*
+                       * Inicia o contador usando
+                       * o horário retornado pelo servidor.
+                       */
+
+                      iniciarTimer(
+                          dados.fim_timestamp
+                      );
+
+                  }
+
+
+                  catch (error) {
+
+                      if (audio) {
+
+                          audio.pause();
+
+                      }
+
+
+                      botao.disabled = false;
+
+
+                      erro.textContent =
+                          error.message;
+
+
+                      erro.hidden = false;
+
+                  }
+
+              }
+          );
+
+      }
+
+      // ==================================
+        // RETOMAR MÚSICA
+        // ==================================
+
+        if (botaoMusica) {
+
+            botaoMusica.addEventListener(
+                'click',
+                async () => {
+
+                    await iniciarMusica();
+
                 }
-
-                window.location.reload();
-
-            }
+            );
 
         }
 
 
-        atualizarTimer();
+         // ==================================
+      // SESSÃO JÁ ATIVA
+      // ==================================
 
-        intervalo = setInterval(
-            atualizarTimer,
-            1000
-        );
+      if (statusSessao === 'ativa') {
 
-    }
+        document.querySelector('.session-box').classList.add('pulse-chakra');
 
+          iniciarTimer(
+              {{ fim_timestamp }}
+          );
 
-    // ==================================
-    // INICIAR SESSÃO
-    // ==================================
+          restaurarMusica();
 
-    if (statusSessao === 'pronta') {
+      }
+    </script>
 
-        const csrfToken =
-            document.querySelector(
-                '#csrf_token'
-            ).value;
-
-
-        form.addEventListener(
-            'submit',
-            async (evento) => {
-
-                evento.preventDefault();
-
-                botao.disabled = true;
-
-                erro.hidden = true;
-
-
-                /*
-                 * Tenta iniciar o áudio imediatamente,
-                 * aproveitando a interação do usuário
-                 * com o botão.
-                 */
-
-                const tentativaDeAudio =
-                    audio.play();
-
-
-                try {
-
-                    const resposta =
-                        await fetch(
-                            form.action,
-                            {
-                                method: 'POST',
-
-                                headers: {
-                                    'Accept':
-                                        'application/json',
-
-                                    'X-CSRFToken':
-                                        csrfToken
-                                }
-                            }
-                        );
-
-
-                    const dados =
-                        await resposta.json();
-
-
-                    if (!resposta.ok) {
-
-                        throw new Error(
-                            dados.erro ||
-                            'Não foi possível iniciar a sessão.'
-                        );
-
-                    }
-
-
-                    /*
-                     * Garante que o áudio realmente
-                     * conseguiu iniciar.
-                     */
-
-                    await tentativaDeAudio.catch(
-                        () => {
-
-                            throw new Error(
-                                'Não foi possível iniciar o áudio.'
-                            );
-
-                        }
-                    );
-
-
-                    /*
-                     * Esconde o formulário.
-                     */
-
-                    form.hidden = true;
-
-
-                    /*
-                     * Mostra a área do contador.
-                     */
-
-                    areaAtiva.hidden = false;
-
-
-                    /*
-                     * Inicia o contador usando
-                     * o horário retornado pelo servidor.
-                     */
-
-                    iniciarTimer(
-                        dados.fim_timestamp
-                    );
-
-                }
-
-
-                catch (error) {
-
-                    if (audio) {
-                        audio.pause();
-                    }
-
-
-                    botao.disabled = false;
-
-                    erro.textContent =
-                        error.message;
-
-                    erro.hidden = false;
-
-                }
-
-            }
-        );
-
-    }
-
-
-    // ==================================
-    // SESSÃO JÁ ATIVA
-    // ==================================
-
-    if (statusSessao === 'ativa') {
-
-        iniciarTimer(
-            "{{ sessao.data_hora_fim_real.timestamp() * 1000 }}"
-        );
-
-    }
-
-</script>
-
-
-{% endif %}
-
-
-</body>
-
+    {% endif %}
+  </body>
 </html>

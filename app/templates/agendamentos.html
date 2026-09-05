@@ -153,6 +153,37 @@
                                         {% endif %}
                                     </td>
 
+                                    <td>
+                                        {% if agendamento.status == 'AGENDADO' and not agendamento.iniciada_em %}
+
+                                            <form
+                                                method="post"
+                                                action="{{ url_for(
+                                                    'agendamento.cancelar',
+                                                    agendamento_id=agendamento.id
+                                                ) }}"
+                                                class="cancel-form"
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="csrf_token"
+                                                    value="{{ csrf_token() }}"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="admin-action deactivate"
+                                                    onclick="return confirm(
+                                                        'Deseja realmente cancelar este agendamento?'
+                                                    );"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            </form>
+
+                                        {% endif %}
+                                    </td>
+
                                 </tr>
 
                             {% else %}

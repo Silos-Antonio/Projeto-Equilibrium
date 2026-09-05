@@ -90,3 +90,86 @@ def criar_agendamento(terapeuta_id, paciente_id, data_hora_inicio, duracao_minut
     finally:
         cursor.close()
         conn.close()
+
+def cancelar_agendamento(terapeuta_id, agendamento_id):
+    """
+    Cancela um agendamento pertencente ao terapeuta.
+
+    Não permite cancelar sessões que já foram iniciadas.
+    """
+
+    conn = get_db_connection()
+
+    if not conn:
+        return False, 'Não foi possível conectar ao banco de dados.'
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Verifica se o agendamento pertence ao terapeuta
+        cursor.execute(
+            """
+            SELECT
+                a.id,
+                a.status,
+                s.iniciada_em
+            FROM agendamentos a
+            INNER JOIN sessoes s
+                ON s.agendamento_id = a.id
+            WHERE a.id = %s
+              AND a.terapeuta_id = %s
+            """,
+            (agendamento_id, terapeuta_id),
+        )
+
+        agendamento = cursor.fetchone()
+
+        if not agendamento:
+            return False, 'Agendamento não encontrado.'
+
+        if agendamento['status'] == 'CANCELADO':
+            return False, 'Este agendamento já foi cancelado.'
+
+        if agendamento['iniciada_em']:
+            return False, (
+                'Não é possível cancelar um agendamento '
+                'cuja sessão já foi iniciada.'
+            )
+
+        # Cancela o agendamento
+        cursor.execute(
+            """
+            UPDATE agendamentos
+            SET status = 'CANCELADO'
+            WHERE id = %s
+              AND terapeuta_id = %s
+            """,
+            (agendamento_id, terapeuta_id),
+        )
+
+        # Garante que a sessão vinculada não fique ativa
+        cursor.execute(
+            """
+            UPDATE sessoes
+            SET ativa = 0
+            WHERE agendamento_id = %s
+            """,
+            (agendamento_id,),
+        )
+
+        conn.commit()
+
+        return True, 'Agendamento cancelado com sucesso.'
+
+    except Exception as error:
+
+        conn.rollback()
+
+        print(f'Erro ao cancelar agendamento: {error}')
+
+        return False, 'Não foi possível cancelar o agendamento.'
+
+    finally:
+
+        cursor.close()
+        conn.close()

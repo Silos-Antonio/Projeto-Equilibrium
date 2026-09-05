@@ -1,164 +1,667 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel • Equilibrium</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
+
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Painel • Equilibrium</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/app.css') }}"
+>
+
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='img/icon.svg') }}"
+>
+
+
 </head>
 
 <body class="app-page">
 
-  <header class="header">
-    <a class="brand" href="{{ url_for('dashboard.index') }}">
-      <span class="brand-mark">
+<header class="header">
+
+
+<a
+    class="brand"
+    href="{{ url_for('dashboard.index') }}"
+>
+
+    <span class="brand-mark">
+
         <div class="brand-logo">
-          <img src="{{ url_for('static', filename='img/icon.svg') }}" alt="icon">
+
+            <img
+                src="{{ url_for('static', filename='img/icon.svg') }}"
+                alt="icon"
+            >
+
         </div>
-      </span>
-      <span>equilibrium<small>para terapeutas</small></span>
+
+    </span>
+
+    <span>
+        equilibrium
+        <small>para terapeutas</small>
+    </span>
+
+</a>
+
+
+<nav
+    class="nav-links"
+    aria-label="Navegação principal"
+>
+
+    <a
+        class="active"
+        href="{{ url_for('dashboard.index') }}"
+    >
+        Visão geral
     </a>
-    
-    <nav class="nav-links" aria-label="Navegação principal">
 
+    <a
+        href="{{ url_for('agendamento.gerir_agendamentos') }}"
+    >
+        Agenda
+    </a>
 
-        <a class="active" href="{{ url_for('dashboard.index') }}">
-            Visão geral
+    <a
+        href="{{ url_for('paciente.gerir_pacientes') }}"
+    >
+        Pacientes
+    </a>
+
+    {% if session.get('perfil') == 'ADMIN' %}
+
+        <a
+            href="{{ url_for('admin.usuarios') }}"
+        >
+            Administração
         </a>
 
-        <a href="{{ url_for('agendamento.gerir_agendamentos') }}">
-            Agenda
-        </a>
+    {% endif %}
 
-        <a href="{{ url_for('paciente.gerir_pacientes') }}">
-            Pacientes
-        </a>
+</nav>
 
-        {% if session.get('perfil') == 'ADMIN' %}
-            <a href="{{ url_for('admin.usuarios') }}">
-                Administração
+
+<div class="header-actions">
+
+    <span class="avatar">
+        T
+    </span>
+
+    <a
+        class="btn-logout"
+        href="{{ url_for('auth.logout') }}"
+    >
+        Sair
+    </a>
+
+</div>
+
+
+</header>
+
+<main class="page-shell">
+
+
+<!-- ======================================== -->
+<!-- INTRODUÇÃO -->
+<!-- ======================================== -->
+
+<section class="page-intro">
+
+    <div>
+
+        <p class="eyebrow">
+            Seu espaço de cuidado
+        </p>
+
+        <h1>
+            Bom dia, terapeuta.
+        </h1>
+
+        <p>
+            Uma visão serena do que importa para o seu dia.
+        </p>
+
+    </div>
+
+    <a
+        class="button button-primary"
+        href="{{ url_for('agendamento.gerir_agendamentos') }}"
+    >
+        + Novo agendamento
+    </a>
+
+</section>
+
+
+{% if not dados %}
+
+
+<!-- ======================================== -->
+<!-- ERRO -->
+<!-- ======================================== -->
+
+<section class="card empty-state">
+
+    <span class="empty-icon">
+        ⌁
+    </span>
+
+    <h2>
+        Não foi possível carregar o painel
+    </h2>
+
+    <p>
+        Verifique a conexão com o banco de dados e atualize a página.
+    </p>
+
+</section>
+
+
+{% else %}
+
+
+<!-- ======================================== -->
+<!-- INDICADORES -->
+<!-- ======================================== -->
+
+<section
+    class="stats"
+    aria-label="Resumo do consultório"
+>
+
+
+    <!-- PACIENTES -->
+
+    <article class="card stat-card">
+
+        <div class="stat-icon sage">
+            ♧
+        </div>
+
+        <div>
+
+            <div class="stat-label">
+                Pacientes ativos
+            </div>
+
+            <div class="stat-value">
+                {{ dados.indicadores.pacientes }}
+            </div>
+
+            <span class="stat-note">
+                em sua jornada
+            </span>
+
+        </div>
+
+    </article>
+
+
+    <!-- AGENDADOS -->
+
+    <article class="card stat-card">
+
+        <div class="stat-icon blue">
+            ◷
+        </div>
+
+        <div>
+
+            <div class="stat-label">
+                Próximas sessões
+            </div>
+
+            <div class="stat-value">
+                {{ dados.indicadores.agendados }}
+            </div>
+
+            <span class="stat-note">
+                agendadas
+            </span>
+
+        </div>
+
+    </article>
+
+
+    <!-- CONCLUÍDOS -->
+
+    <article class="card stat-card">
+
+        <div class="stat-icon peach">
+            ✓
+        </div>
+
+        <div>
+
+            <div class="stat-label">
+                Sessões concluídas
+            </div>
+
+            <div class="stat-value">
+                {{ dados.indicadores.concluidos }}
+            </div>
+
+            <span class="stat-note">
+                momentos de cuidado
+            </span>
+
+        </div>
+
+    </article>
+
+
+    <!-- CANCELADOS -->
+
+    <article class="card stat-card">
+
+        <div class="stat-icon lavender">
+            ×
+        </div>
+
+        <div>
+
+            <div class="stat-label">
+                Agendamentos cancelados
+            </div>
+
+            <div class="stat-value">
+                {{ dados.indicadores.cancelados }}
+            </div>
+
+            <span class="stat-note">
+                cancelados
+            </span>
+
+        </div>
+
+    </article>
+
+
+    <!-- EM ANDAMENTO -->
+
+    <article class="card stat-card">
+
+        <div class="stat-icon lavender">
+            ◉
+        </div>
+
+        <div>
+
+            <div class="stat-label">
+                Em andamento
+            </div>
+
+            <div class="stat-value">
+                {{ dados.indicadores.em_andamento }}
+            </div>
+
+            <span class="stat-note">
+                agora
+            </span>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- ======================================== -->
+<!-- GRID PRINCIPAL -->
+<!-- ======================================== -->
+
+<section class="dashboard-grid">
+
+
+    <!-- ==================================== -->
+    <!-- GRÁFICO -->
+    <!-- ==================================== -->
+
+    <article class="card chart-card">
+
+        <div class="card-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    Movimento
+                </p>
+
+                <h2>
+                    Ritmo da semana
+                </h2>
+
+            </div>
+
+            <span class="period-pill">
+                Últimos 7 dias
+            </span>
+
+        </div>
+
+
+        <div
+            class="chart"
+            role="img"
+            aria-label="Gráfico de pacientes agendados, sessões concluídas e agendamentos cancelados nos últimos sete dias"
+        >
+
+            {% for dia in dados.serie %}
+
+                <div
+                    class="grupo-dia"
+                    title="{{ dia.rotulo }}: {{ dia.agendados }} agendados, {{ dia.concluidos }} concluídos, {{ dia.cancelados }} cancelados"
+                >
+
+                    <div
+                        class="barra agendados"
+                        data-altura="{{ dia.agendados_percentual }}"
+                    ></div>
+
+                    <div
+                        class="barra concluidos"
+                        data-altura="{{ dia.concluidos_percentual }}"
+                    ></div>
+
+                    <div
+                        class="barra cancelados"
+                        data-altura="{{ dia.cancelados_percentual }}"
+                    ></div>
+
+                    <span class="rotulo-dia">
+                        {{ dia.rotulo }}
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="legenda">
+
+            <span class="l-agendados">
+                Agendadas
+            </span>
+
+            <span class="l-concluidos">
+                Concluídas
+            </span>
+
+            <span class="l-cancelados">
+                Canceladas
+            </span>
+
+        </div>
+
+    </article>
+
+
+    <!-- ==================================== -->
+    <!-- PRÓXIMOS AGENDAMENTOS -->
+    <!-- ==================================== -->
+
+    <article class="card appointments-card">
+
+        <div class="card-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    Próximos passos
+                </p>
+
+                <h2>
+                    Sua agenda
+                </h2>
+
+            </div>
+
+            <a
+                href="{{ url_for('agendamento.gerir_agendamentos') }}"
+            >
+                Ver agenda →
             </a>
+
+        </div>
+
+
+        {% if dados.proximos_agendamentos %}
+
+            <div class="appointment-list">
+
+                {% for agendamento in dados.proximos_agendamentos[:4] %}
+
+                    <div class="appointment-item">
+
+                        <span class="time-badge">
+                            {{ agendamento.data_hora_inicio.strftime('%H:%M') }}
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                {{ agendamento.paciente_nome }}
+                            </strong>
+
+                            <span>
+                                {{ agendamento.data_hora_inicio.strftime('%d/%m') }}
+                                · sessão individual
+                            </span>
+
+                        </div>
+
+
+                        {% if agendamento.ativa %}
+
+                            <span class="live-dot">
+                                Em sessão
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="soft-empty">
+
+                Sua agenda está livre por enquanto.
+
+                <a
+                    href="{{ url_for('agendamento.gerir_agendamentos') }}"
+                >
+                    Criar agendamento
+                </a>
+
+            </div>
 
         {% endif %}
 
-    </nav>
+    </article>
 
-    
-    <div class="header-actions">
-      <span class="avatar">T</span>
-      <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
-    </div>
-  </header>
-  <main class="page-shell">
-    <section class="page-intro">
-      <div>
-        <p class="eyebrow">Seu espaço de cuidado</p>
-        <h1>Bom dia, terapeuta.</h1>
-        <p>Uma visão serena do que importa para o seu dia.</p>
-      </div>
-      <a class="button button-primary" href="{{ url_for('agendamento.gerir_agendamentos') }}">+ Novo agendamento</a>
-    </section>{% if not dados %}
-    <section class="card empty-state">
-      <span class="empty-icon">⌁</span>
-      <h2>Não foi possível carregar o painel</h2>
-      <p>Verifique a conexão com o banco de dados e atualize a página.</p>
-    </section>{% else %}
-    <section class="stats" aria-label="Resumo do consultório">
-      <article class="card stat-card">
-        <div class="stat-icon sage">♧</div>
-        <div>
-          <div class="stat-label">Pacientes ativos</div>
-          <div class="stat-value">{{ dados.indicadores.pacientes }}</div>
-          <span class="stat-note">em sua jornada</span>
-        </div>
-      </article>
-      
-      <article class="card stat-card">
-        <div class="stat-icon blue">◷</div>
-        <div>
-          <div class="stat-label">Próximas sessões</div>
-          <div class="stat-value">{{ dados.indicadores.agendados }}</div>
-          <span class="stat-note">agendadas</span>
-        </div>
-      </article>
-      <article class="card stat-card">
-        <div class="stat-icon peach">✓</div>
-        <div>
-          <div class="stat-label">Sessões concluídas</div>
-          <div class="stat-value">{{ dados.indicadores.concluidos }}</div>
-          <span class="stat-note">momentos de cuidado</span>
-        </div>
-      </article>
-      <article class="card stat-card">
-        <div class="stat-icon lavender">◉</div>
-        <div>
-          <div class="stat-label">Em andamento</div>
-          <div class="stat-value">{{ dados.indicadores.em_andamento }}</div>
-          <span class="stat-note">agora</span>
-        </div>
-      </article>
-    </section>
-    <section class="dashboard-grid">
-      <article class="card chart-card">
+
+    <!-- ==================================== -->
+    <!-- PACIENTES RECENTES -->
+    <!-- ==================================== -->
+
+    <article class="card full recent-card">
+
         <div class="card-heading">
-          <div>
-            <p class="eyebrow">Movimento</p>
-            <h2>Ritmo da semana</h2>
-          </div>
-          <span class="period-pill">Últimos 7 dias</span>
-        </div>
-        <div class="chart" role="img" aria-label="Gráfico de pacientes agendados e sessões concluídas nos últimos sete dias">{% for dia in dados.serie %}
-          <div class="grupo-dia" title="{{ dia.rotulo }}: {{ dia.agendados }} agendados, {{ dia.concluidos }} concluídos">
-            <div class="barra agendados" data-altura="{{ dia.agendados_percentual }}"></div>
-            <div class="barra concluidos" data-altura="{{ dia.concluidos_percentual }}"></div>
-            <span class="rotulo-dia">{{ dia.rotulo }}</span>
-          </div>{% endfor %}
-        </div>
-        <div class="legenda">
-          <span class="l-agendados">Agendadas</span>
-          <span class="l-concluidos">Concluídas</span>
-        </div>
-      </article>
-      <article class="card appointments-card">
-        <div class="card-heading">
-          <div>
-            <p class="eyebrow">Próximos passos</p>
-            <h2>Sua agenda</h2>
-          </div>
-          <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Ver agenda →</a>
-        </div>{% if dados.proximos_agendamentos %}
-        <div class="appointment-list">{% for agendamento in dados.proximos_agendamentos[:4] %}
-          <div class="appointment-item">
-            <span class="time-badge">{{ agendamento.data_hora_inicio.strftime('%H:%M') }}</span>
+
             <div>
-              <strong>{{ agendamento.paciente_nome }}</strong>
-              <span>{{ agendamento.data_hora_inicio.strftime('%d/%m') }} · sessão individual</span></div>{% if agendamento.ativa %}
-              <span class="live-dot">Em sessão</span>{% endif %}
-            </div>{% endfor %}</div>{% else %}
-            <div class="soft-empty">Sua agenda está livre por enquanto.
-              <a href="{{ url_for('agendamento.gerir_agendamentos') }}"> Criar agendamento</a>
-            </div>{% endif %}
-      </article>
-      
-      <article class="card full recent-card">
+
+                <p class="eyebrow">
+                    Relacionamentos
+                </p>
+
+                <h2>
+                    Pacientes recentes
+                </h2>
+
+            </div>
+
+            <a
+                href="{{ url_for('paciente.gerir_pacientes') }}"
+            >
+                Ver todos →
+            </a>
+
+        </div>
+
+
+        {% if dados.pacientes_recentes %}
+
+            <div class="patient-list">
+
+                {% for paciente in dados.pacientes_recentes[:6] %}
+
+                    <div class="patient-row">
+
+                        <span class="patient-avatar">
+                            {{ paciente.nome[0]|upper }}
+                        </span>
+
+                        <strong>
+                            {{ paciente.nome }}
+                        </strong>
+
+                        <span>
+                            {{ paciente.email or paciente.telefone or 'Sem contato informado' }}
+                        </span>
+
+                        <time>
+                            {{ paciente.criado_em.strftime('%d/%m/%Y') }}
+                        </time>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="soft-empty">
+                Os pacientes cadastrados aparecerão aqui.
+            </p>
+
+        {% endif %}
+
+    </article>
+
+
+    <!-- ==================================== -->
+    <!-- ÚLTIMOS CANCELAMENTOS -->
+    <!-- ==================================== -->
+
+    <article class="card full recent-card">
+
         <div class="card-heading">
-          <div>
-            <p class="eyebrow">Relacionamentos</p>
-            <h2>Pacientes recentes</h2>
-          </div>
-          <a href="{{ url_for('paciente.gerir_pacientes') }}">Ver todos →</a>
-        </div>{% if dados.pacientes_recentes %}
-        <div class="patient-list">{% for paciente in dados.pacientes_recentes[:6] %}
-          <div class="patient-row">
-            <span class="patient-avatar">{{ paciente.nome[0]|upper }}</span>
-            <strong>{{ paciente.nome }}</strong>
-            <span>{{ paciente.email or paciente.telefone or 'Sem contato informado' }}</span>
-            <time>{{ paciente.criado_em.strftime('%d/%m/%Y') }}</time>
-          </div>{% endfor %}
-        </div>{% else %}
-        <p class="soft-empty">Os pacientes cadastrados aparecerão aqui.</p>{% endif %}
-      </article>
-    </section>{% endif %}
-  </main><script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+            <div>
+
+                <p class="eyebrow">
+                    Histórico
+                </p>
+
+                <h2>
+                    Últimos cancelamentos
+                </h2>
+
+            </div>
+
+            <a
+                href="{{ url_for('agendamento.gerir_agendamentos') }}"
+            >
+                Ver agenda →
+            </a>
+
+        </div>
+
+
+        {% if dados.agendamentos_cancelados %}
+
+            <div class="appointment-list">
+
+                {% for agendamento in dados.agendamentos_cancelados[:5] %}
+
+                    <div class="appointment-item">
+
+                        <span class="time-badge">
+                            {{ agendamento.data_hora_inicio.strftime('%H:%M') }}
+                        </span>
+
+
+                        <div>
+
+                            <strong>
+                                {{ agendamento.paciente_nome }}
+                            </strong>
+
+                            <span>
+                                {{ agendamento.data_hora_inicio.strftime('%d/%m/%Y') }}
+                                · sessão cancelada
+                            </span>
+
+                        </div>
+
+
+                        <span class="cancelled-label">
+                            Cancelada
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="soft-empty">
+                Nenhum agendamento cancelado.
+            </div>
+
+        {% endif %}
+
+    </article>
+
+
+</section>
+
+
+{% endif %}
+
+
+</main>
+
+<script
+    src="{{ url_for('static', filename='js/dashboard.js') }}"
+></script>
+
 </body>
+
 </html>

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from app.services.agendamento_service import criar_agendamento, listar_agendamentos_do_terapeuta
+from app.services.agendamento_service import criar_agendamento, listar_agendamentos_do_terapeuta, cancelar_agendamento
 from app.services.paciente_service import listar_pacientes_do_terapeuta
 from app.utils.decorators import login_required
 from app.services.sessao_service import encerrar_sessoes_expiradas
@@ -41,4 +41,27 @@ def gerir_agendamentos():
         'agendamentos.html',
         pacientes=listar_pacientes_do_terapeuta(terapeuta_id),
         agendamentos=listar_agendamentos_do_terapeuta(terapeuta_id),
+    )
+
+@agendamento_bp.route(
+    '/agendamentos/<int:agendamento_id>/cancelar',
+    methods=['POST']
+)
+@login_required
+def cancelar(agendamento_id):
+
+    terapeuta_id = session['usuario_id']
+
+    sucesso, mensagem = cancelar_agendamento(
+        terapeuta_id,
+        agendamento_id,
+    )
+
+    if sucesso:
+        flash(mensagem, 'success')
+    else:
+        flash(mensagem, 'error')
+
+    return redirect(
+        url_for('agendamento.gerir_agendamentos')
     )

@@ -11,34 +11,83 @@ sessao_bp = Blueprint('sessao', __name__)
 
 @sessao_bp.route('/sessao/<token>')
 def acessar_sessao(token):
-    # 1. Busca os dados no banco
+
+    # ==========================================
+    # BUSCA A SESSÃO
+    # ==========================================
+
     sessao = buscar_dados_sessao(token)
 
-    # 2. Se o token não existir (ou digitaram errado na URL), bloqueia
     if not sessao:
-        # Passamos um status de erro para a tela
-        return render_template('sessao.html', status='erro', mensagem="Sessão não encontrada ou link inválido.")
+
+        return render_template(
+            'sessao.html',
+            sessao=sessao,
+            status=status,
+            fim_timestamp=fim_timestamp
+        )
+
+
+    # ==========================================
+    # DETERMINA O STATUS
+    # ==========================================
 
     agora = datetime.now()
+
+    fim_timestamp = None
+
+
     if agora < sessao['data_hora_inicio']:
+
         status = 'aguardando'
+
+
     elif agora > sessao['data_hora_fim'] and not sessao['iniciada_em']:
+
         status = 'encerrada'
+
+
     elif not sessao['iniciada_em']:
+
         status = 'pronta'
+
+
     elif sessao['finalizada_em']:
+
         status = 'encerrada'
+
+
     else:
-        fim_real = sessao['iniciada_em'] + timedelta(minutes=sessao['duracao_minutos'])
+
+        fim_real = (
+            sessao['iniciada_em']
+            + timedelta(minutes=sessao['duracao_minutos'])
+        )
+
         if agora >= fim_real:
+
             encerrar_sessao(token)
             status = 'encerrada'
+
         else:
-            sessao['data_hora_fim_real'] = fim_real
+
             status = 'ativa'
 
-    return render_template('sessao.html', sessao=sessao, status=status)
+            fim_timestamp = int(
+                fim_real.timestamp() * 1000
+            )
 
+
+    # ==========================================
+    # RENDERIZA A PÁGINA
+    # ==========================================
+
+    return render_template(
+        'sessao.html',
+        sessao=sessao,
+        status=status,
+        fim_timestamp=fim_timestamp
+    )
 
 @sessao_bp.route('/sessao/<token>/iniciar', methods=['POST'])
 def iniciar(token):
