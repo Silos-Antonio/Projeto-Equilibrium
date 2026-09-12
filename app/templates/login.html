@@ -24,6 +24,15 @@
                 <button><span class="text">Bem vindo!</span></button>
 
             </form>
+             <footer style="text-align: center; margin-top: 24px; font-size: 0.75rem; color: var(--muted);">
+                <p style="margin: 0;">
+                    &copy; 2026 Equilibrium. Todos os direitos reservados.<br> 
+                    <span style="margin: 0 6px;">•</span>
+                    <a href="{{ url_for('auth.termos_de_uso') }}" target="_blank" style="color: var(--muted); text-decoration: underline;">Termos de Uso</a>
+                    <span style="margin: 0 6px;">•</span>
+                    <a href="{{ url_for('auth.politica_de_privacidade') }}" target="_blank" style="color: var(--muted); text-decoration: underline;">Privacidade</a>
+                </p>
+            </footer>
         </main>
     </body>
     </html>

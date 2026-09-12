@@ -20,8 +20,11 @@
     />
   </head>
 
-  <body class="session-page">
-    <main class="session-box" {% if status == 'ativa' %}pulse-chakra{% endif %}">
+  <body
+    class="session-page"
+    style="background-image: url('{{ url_for('static', filename='img/' ~ imagem_fundo) }}');">
+    
+    <main class="session-box {% if status == 'ativa' %}pulse-chakra{% endif %}">
       <!-- ============================== -->
       <!-- MARCA -->
       <!-- ============================== -->
@@ -112,7 +115,7 @@
 
         <button
           id="botao-iniciar"
-          class="button button-primary session-cta"
+          class="button button-primary cta"
           type="submit"
         >
           Iniciar minha sessão
@@ -145,12 +148,7 @@
         <p class="breath-note">Inspire devagar. Expire com gentileza.</p>
       </div>
 
-      <audio id="musica" loop preload="metadata">
-        <source
-          src="{{ url_for('sessao.audio_meditacao') }}"
-          type="audio/mpeg"
-        />
-      </audio>
+      <audio id="musica" src="{{ url_for('sessao.audio_meditacao', nome_arquivo=sessao.musica_selecionada) }}" preload="auto"></audio>
 
       <!-- ============================== -->
       <!-- SESSÃO ATIVA -->
@@ -196,7 +194,7 @@
 
       <audio id="musica" loop preload="metadata">
         <source
-          src="{{ url_for('sessao.audio_meditacao') }}"
+          src="{{ url_for('sessao.audio_meditacao', nome_arquivo=nome_musica) }}"
           type="audio/mpeg"
         />
       </audio>

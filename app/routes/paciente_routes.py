@@ -10,6 +10,7 @@ def gerir_pacientes():
     terapeuta_id = session.get('usuario_id')
 
     if request.method == 'POST':
+        # ... (seu código de salvar paciente continua igual aqui) ...
         nome = request.form.get('nome')
         email = request.form.get('email')
         telefone = request.form.get('telefone')
@@ -24,10 +25,24 @@ def gerir_pacientes():
             
         return redirect(url_for('paciente.gerir_pacientes'))
 
-    # CHAMADA DA FUNÇÃO CORRIGIDA AQUI:
-    lista_pacientes = listar_pacientes_do_terapeuta(terapeuta_id)
+    # ===== LÓGICA DE PAGINAÇÃO =====
+    # Pega a página da URL (ex: ?page=2). Se não existir, o padrão é 1.
+    page = request.args.get('page', 1, type=int)
+    limite = 20
+    deslocamento = (page - 1) * limite
+
+    # Chama a função atualizada que agora retorna duas variáveis
+    lista_pacientes, total_pacientes = listar_pacientes_do_terapeuta(terapeuta_id, limite, deslocamento)
     
-    return render_template('pacientes.html', pacientes=lista_pacientes)
+    # Calcula o total de páginas (arredondando para cima)
+    total_pages = (total_pacientes + limite - 1) // limite
+    
+    return render_template(
+        'pacientes.html', 
+        pacientes=lista_pacientes, 
+        page=page, 
+        total_pages=total_pages
+    )
 
 
 @paciente_bp.route('/pacientes/<int:paciente_id>/editar', methods=['GET', 'POST'])

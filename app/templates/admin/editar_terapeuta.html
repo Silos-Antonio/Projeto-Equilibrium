@@ -4,118 +4,135 @@
 
 <head>
     <meta charset="UTF-8">
-
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>Editar Terapeuta • Equilibrium</title>
-
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/app.css') }}"
->
-
-<link
-    rel="icon"
-    type="image/png"
-    href="{{ url_for('static', filename='img/icon.svg') }}"
->
-
-
-</head>
-
-<body>
-
-<main class="container">
-
-    <h1>Editar Terapeuta</h1>
-
-    <div class="messages">
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-
-            {% for category, message in messages %}
-
-                <div class="msg {{ category }}">
-                    {{ message }}
-                </div>
-
-            {% endfor %}
-
-        {% endwith %}
-
-    </div>
-
-    <form
-        method="POST"
-        action="{{ url_for(
-            'admin.editar_usuario',
-            usuario_id=usuario.id
-        ) }}"
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="{{ csrf_token() }}"
+    <title>Editar Terapeuta • Equilibrium</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/app.css') }}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='img/icon.svg') }}"
+    >
+</head>
+
+<body class="app-page">
+
+    <header class="header">
+        <a
+            class="brand"
+            href="{{ url_for('dashboard.index') }}"
         >
-
-        <label for="nome">Nome</label>
-
-        <input
-            id="nome"
-            name="nome"
-            type="text"
-            required
-            maxlength="100"
-            value="{{ usuario.nome }}"
-            autocomplete="name"
-        >
-
-
-        <label for="email">E-mail</label>
-
-        <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            maxlength="100"
-            value="{{ usuario.email }}"
-            autocomplete="email"
-        >
-
-
-        <label for="telefone">Telefone</label>
-
-        <input
-            id="telefone"
-            name="telefone"
-            type="tel"
-            required
-            maxlength="20"
-            value="{{ usuario.telefone }}"
-            autocomplete="tel"
-        >
-
-
-        <button type="submit">
-            Salvar alterações
-        </button>
-
-    </form>
-
-    <p>
-        <a href="{{ url_for('admin.usuarios') }}">
-            Voltar para usuários
+            <span class="brand-mark">
+                <span class="brand-logo">
+                    <img
+                        src="{{ url_for('static', filename='img/icon.svg') }}"
+                        alt="icon"
+                    >
+                </span>
+            </span>
+            <span>equilibrium<small>para terapeutas</small></span>
         </a>
-    </p>
 
-</main>
+        <nav class="nav-links" aria-label="Navegação principal">
+            <a href="{{ url_for('dashboard.index') }}">Visão geral</a>
+            <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
+            <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
+            {% if session.get('perfil') == 'ADMIN' %}
+                <a class="active" href="{{ url_for('admin.usuarios') }}">Administração</a>
+            {% endif %}
+        </nav>
 
+        <div class="header-actions">
+            <span class="avatar">
+                {{ (session.get('nome') or 'A')[0]|upper }}
+            </span>
+            <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="card" style="max-width: 600px; margin: 0 auto; width: 100%;">
+            <h2>Editar terapeuta</h2>
+
+            <div class="messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="msg {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin.editar_usuario', usuario_id=usuario.id) }}"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <label for="nome">Nome</label>
+                <input
+                    id="nome"
+                    name="nome"
+                    type="text"
+                    required
+                    maxlength="100"
+                    value="{{ usuario.nome }}"
+                    autocomplete="name"
+                >
+
+                <label for="email">E-mail</label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    maxlength="100"
+                    value="{{ usuario.email }}"
+                    autocomplete="email"
+                >
+
+                <label for="telefone">Telefone</label>
+                <input
+                    id="telefone"
+                    name="telefone"
+                    type="tel"
+                    required
+                    maxlength="20"
+                    value="{{ usuario.telefone }}"
+                    autocomplete="tel"
+                >
+
+                <label for="nova_senha">Nova senha (opcional)</label>
+                <input
+                    id="nova_senha"
+                    name="nova_senha"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Deixe em branco para manter a atual"
+                >
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="button button-primary form-submit">Salvar alterações</button>
+                    <a href="{{ url_for('admin.usuarios') }}" class="button button-primary form-submit" style="background: transparent; color: var(--muted); border: 1px solid var(--line); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: 6px;">
+                        Voltar
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
 
 </body>
 

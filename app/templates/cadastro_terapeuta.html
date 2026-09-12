@@ -114,16 +114,17 @@
             placeholder="••••••••"
         >
 
+        
 
-        <button type="submit">
-            <span class="text">Cadastrar terapeuta</span>
-        </button>
+        <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+            <button type="submit" class="button button-primary form-submit">Cadastrar Terapeuta</button>
+            <a href="{{ url_for('admin.usuarios') }}" class="button button-primary form-submit" style="background: transparent; color: var(--muted); border: 1px solid var(--line); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: 6px;">
+                Voltar
+            </a>
+        </div>
 
     </form>
 
 </main>
-
-
 </body>
-
 </html>

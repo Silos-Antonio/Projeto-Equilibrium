@@ -24,6 +24,7 @@ def buscar_dados_sessao(token_acesso):
             s.ativa,
             s.iniciada_em,
             s.finalizada_em,
+            s.musica_selecionada,
             a.data_hora_inicio,
             a.data_hora_fim,
             a.status AS agendamento_status,

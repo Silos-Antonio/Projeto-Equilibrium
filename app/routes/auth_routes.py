@@ -24,6 +24,8 @@ def login():
         if usuario:
             session['usuario_id'] = usuario['id']
             session['perfil'] = usuario['perfil']
+            nome_completo = usuario.get('nome', '')
+            session['nome'] = nome_completo.split()[0] if nome_completo else 'Terapeuta'
 
             return redirect(url_for('dashboard.index'))
 
@@ -74,3 +76,11 @@ def logout():
     # Segurança: Limpa o cookie e encerra a sessão
     session.clear()
     return redirect(url_for('auth.login'))
+
+@auth_bp.route('/termos-de-uso')
+def termos_de_uso():
+    return render_template('termos_de_uso.html')
+
+@auth_bp.route('/politica_de_privacidade.html')
+def politica_de_privacidade():
+    return render_template('politica_de_privacidade.html')

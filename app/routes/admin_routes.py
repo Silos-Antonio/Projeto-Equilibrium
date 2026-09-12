@@ -18,7 +18,8 @@ from app.utils.decorators import admin_required
 
 from app.services.admin_service import (
     listar_usuarios,
-    alterar_situacao_usuario
+    alterar_situacao_usuario,
+    redefinir_senha_terapeuta
 )
 
 from app.extensions import limiter
@@ -76,18 +77,19 @@ def editar_usuario(usuario_id):
         nome = request.form.get('nome', '').strip()
         email = request.form.get('email', '').strip()
         telefone = request.form.get('telefone', '').strip()
+        nova_senha = request.form.get('nova_senha', '').strip() # <-- Captura a nova senha opcional
 
         if not nome or not email or not telefone:
             flash(
                 'Preencha todos os campos obrigatórios.',
                 'error'
             )
-
             return render_template(
                 'admin/editar_terapeuta.html',
                 usuario=usuario
             )
 
+        # Atualiza os dados cadastrais básicos
         sucesso, mensagem = atualizar_terapeuta(
             usuario_id,
             nome,
@@ -95,11 +97,26 @@ def editar_usuario(usuario_id):
             telefone
         )
 
-        if sucesso:
-            flash(mensagem, 'success')
-            return redirect(url_for('admin.usuarios'))
+        if not sucesso:
+            flash(mensagem, 'error')
+            return render_template('admin/editar_terapeuta.html', usuario=usuario)
 
-        flash(mensagem, 'error')
+        # Se o admin digitou uma nova senha, faz a redefinição separadamente
+        if nova_senha:
+            if len(nova_senha) < 6: # Validação opcional de tamanho mínimo
+                flash('A nova senha deve ter pelo menos 6 caracteres.', 'error')
+                return render_template('admin/editar_terapeuta.html', usuario=usuario)
+                
+            sucesso_senha, msg_senha = redefinir_senha_terapeuta(usuario_id, nova_senha)
+            if not sucesso_senha:
+                flash(msg_senha, 'error')
+                return render_template('admin/editar_terapeuta.html', usuario=usuario)
+            
+            flash('Dados e nova senha atualizados com sucesso!', 'success')
+        else:
+            flash('Dados do terapeuta atualizados com sucesso!', 'success')
+
+        return redirect(url_for('admin.usuarios'))
 
     return render_template(
         'admin/editar_terapeuta.html',

@@ -1,13 +1,19 @@
 # app/routes/sessao_routes.py
 from datetime import datetime, timedelta
-
 from pathlib import Path
-
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
-
 from app.services.sessao_service import buscar_dados_sessao, encerrar_sessao, iniciar_sessao
+from werkzeug.utils import secure_filename
 
 sessao_bp = Blueprint('sessao', __name__)
+
+MAPA_IMAGENS_SESSAO = {
+    'Tradicional.mp3': 'Tradicional.png',
+    'Nature.mp3': 'Nature.png',
+    'Ocean.mp3': 'Ocean.png',
+    'Spirit.mp3': 'Spirit.png',
+    'Cosmic.mp3': 'Cosmic.png'
+}
 
 @sessao_bp.route('/sessao/<token>')
 def acessar_sessao(token):
@@ -19,13 +25,23 @@ def acessar_sessao(token):
     sessao = buscar_dados_sessao(token)
 
     if not sessao:
-
         return render_template(
             'sessao.html',
-            sessao=sessao,
-            status=status,
-            fim_timestamp=fim_timestamp
+            sessao=None,
+            status='erro',
+            fim_timestamp=None,
+            imagem_fundo='background-img.png'
         )
+
+    nome_musica = sessao.get(
+        'musica_selecionada',
+        '528Hz River.mp3'
+    )
+
+    imagem_fundo = MAPA_IMAGENS_SESSAO.get(
+        nome_musica,
+        'background-img.png'
+    )
 
 
     # ==========================================
@@ -86,7 +102,9 @@ def acessar_sessao(token):
         'sessao.html',
         sessao=sessao,
         status=status,
-        fim_timestamp=fim_timestamp
+        fim_timestamp=fim_timestamp,
+        imagem_fundo=imagem_fundo,
+        nome_musica=nome_musica
     )
 
 @sessao_bp.route('/sessao/<token>/iniciar', methods=['POST'])
@@ -101,9 +119,14 @@ def iniciar(token):
         flash(resultado, 'error')
     return redirect(url_for('sessao.acessar_sessao', token=token))
 
-
-@sessao_bp.route('/audio/meditacao.mp3')
-def audio_meditacao():
-    """Entrega o MP3 com requisições condicionais e suporte a retomada do navegador."""
-    arquivo = Path(__file__).resolve().parent.parent / 'sound' / '528Hz River.mp3'
+@sessao_bp.route('/audio/<nome_arquivo>')
+def audio_meditacao(nome_arquivo):
+    
+    arquivo_seguro = secure_filename(nome_arquivo)
+    
+    arquivo = Path(__file__).resolve().parent.parent / 'sound' / arquivo_seguro
+    
+    if not arquivo.exists():
+        return "Áudio não encontrado", 404
+        
     return send_file(arquivo, mimetype='audio/mpeg', conditional=True, max_age=60 * 60 * 24 * 7)

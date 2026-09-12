@@ -2,30 +2,37 @@ import mysql.connector
 
 from app.services.db import get_db_connection
 
-def listar_pacientes_do_terapeuta(terapeuta_id):
+def listar_pacientes_do_terapeuta(terapeuta_id, limite=20, deslocamento=0):
     """
-    Lista somente os pacientes cadastrados pelo terapeuta autenticado.
+    Lista os pacientes cadastrados pelo terapeuta autenticado com paginação.
+    Retorna a lista de pacientes e o número total de pacientes.
     """
     conn = get_db_connection()
     if not conn:
-        return []
+        return [], 0
         
     cursor = conn.cursor(dictionary=True)
     
+    # Conta o total de pacientes para a paginação
+    cursor.execute("SELECT COUNT(*) as total FROM pacientes WHERE terapeuta_id = %s", (terapeuta_id,))
+    total_pacientes = cursor.fetchone()['total']
+    
+    # Busca apenas os pacientes da página atual
     query = """
         SELECT p.id, p.nome, p.email, p.telefone, p.observacoes, p.criado_em 
         FROM pacientes p
         WHERE p.terapeuta_id = %s
         ORDER BY p.nome ASC
+        LIMIT %s OFFSET %s
     """
     
-    cursor.execute(query, (terapeuta_id,))
+    cursor.execute(query, (terapeuta_id, limite, deslocamento))
     pacientes = cursor.fetchall()
     
     cursor.close()
     conn.close()
     
-    return pacientes
+    return pacientes, total_pacientes
 
 def criar_paciente(terapeuta_id, nome, email, telefone="", observacoes=""):
     """

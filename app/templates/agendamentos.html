@@ -22,7 +22,9 @@
             <a href="{{ url_for('dashboard.index') }}">Visão geral</a>
             <a class="active" href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
             <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
-            <a href="{{ url_for('admin.usuarios') }}">Administração</a>
+            {% if session.get('perfil') == 'ADMIN' %}
+                <a href="{{ url_for('admin.usuarios') }}">Administração</a>
+            {% endif %}
         </nav>
         <div class="header-actions">
             <span class="avatar">T</span>
@@ -57,6 +59,12 @@
                     </select>
                     <label for="data_hora">Data e horário</label>
                     <input type="datetime-local" id="data_hora" name="data_hora" required>
+                    <label for="musica" id="musica" required>Selecione a música da sessão</label>
+                    <select name="musica">
+                        {% for musica in musicas %}
+                            <option value="{{ musica.arquivo }}">{{ musica.nome }}</option>
+                        {% endfor %}
+                    </select>
                     <label for="duracao_minutos">Duração</label>
                     <select id="duracao_minutos" name="duracao_minutos" required>
                         <option value="20">20 minutos</option>
@@ -155,32 +163,34 @@
 
                                     <td>
                                         {% if agendamento.status == 'AGENDADO' and not agendamento.iniciada_em %}
-
-                                            <form
-                                                method="post"
-                                                action="{{ url_for(
-                                                    'agendamento.cancelar',
-                                                    agendamento_id=agendamento.id
-                                                ) }}"
-                                                class="cancel-form"
-                                            >
-                                                <input
-                                                    type="hidden"
-                                                    name="csrf_token"
-                                                    value="{{ csrf_token() }}"
+                                            <div style="display: flex; gap: 8px;">
+                                                <!-- BOTÃO EDITAR -->
+                                                <button 
+                                                    type="button" 
+                                                    class="admin-action edit" 
+                                                    data-id="{{ agendamento.id }}"
+                                                    data-hora="{{ agendamento.data_hora_inicio.strftime('%Y-%m-%dT%H:%M') }}"
+                                                    onclick="abrirModalEdicao(this.dataset.id, this.dataset.hora)"
                                                 >
-
-                                                <button
-                                                    type="submit"
-                                                    class="admin-action deactivate"
-                                                    onclick="return confirm(
-                                                        'Deseja realmente cancelar este agendamento?'
-                                                    );"
-                                                >
-                                                    Cancelar
+                                                    Editar
                                                 </button>
-                                            </form>
 
+                                                <!-- BOTÃO CANCELAR -->
+                                                <form
+                                                    method="post"
+                                                    action="{{ url_for('agendamento.cancelar', agendamento_id=agendamento.id) }}"
+                                                    class="cancel-form"
+                                                >
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button
+                                                        type="submit"
+                                                        class="admin-action deactivate"
+                                                        onclick="return confirm('Deseja realmente cancelar este agendamento?');"
+                                                    >
+                                                        Cancelar
+                                                    </button>
+                                                </form>
+                                            </div>
                                         {% endif %}
                                     </td>
 
@@ -195,9 +205,80 @@
                             {% endfor %}
                     </tbody>
                         </table>
-                    </div>
-                </section>
-            </section>
-        </main>
+            </div>
+
+            {% if paginacao.total_paginas > 1 %}
+            <div class="pagination">
+                {% if paginacao.pagina_atual > 1 %}
+                    <a href="{{ url_for('agendamento.gerir_agendamentos', page=paginacao.pagina_atual - 1) }}" class="btn-link">&laquo; Anterior</a>
+                {% else %}
+                    <span class="btn-link disabled">&laquo; Anterior</span>
+                {% endif %}
+
+                <span class="page-info">
+                    Página {{ paginacao.pagina_atual }} de {{ paginacao.total_paginas }}
+                </span>
+
+                {% if paginacao.pagina_atual < paginacao.total_paginas %}
+                    <a href="{{ url_for('agendamento.gerir_agendamentos', page=paginacao.pagina_atual + 1) }}" class="btn-link">Próxima &raquo;</a>
+                {% else %}
+                    <span class="btn-link disabled">Próxima &raquo;</span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </section>
+    </section>
+
+    <!-- MODAL DE EDIÇÃO -->
+    <dialog id="modal-editar" class="modal">
+        <div class="modal-content card booking-form" style="margin: 0; border: none; box-shadow: none;">
+            <div class="card-heading" style="margin-bottom: 15px;">
+                <h2 style="margin: 0;">Remarcar Encontro</h2>
+                <button type="button" class="btn-close" onclick="fecharModalEdicao()">&times;</button>
+            </div>
+            
+            <form id="form-editar" method="post" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <label for="edit_data_hora">Nova Data e horário</label>
+                <input type="datetime-local" id="edit_data_hora" name="data_hora" required>
+                
+                <label for="edit_duracao_minutos">Duração</label>
+                <select id="edit_duracao_minutos" name="duracao_minutos" required>
+                    <option value="20">20 minutos</option>
+                    <option value="30">30 minutos</option>
+                    <option value="45">45 minutos</option>
+                    <option value="60">1 hora</option>
+                    <option value="90">1h30</option>
+                    <option value="120">2 horas</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px; margin-top: 25px; justify-content: flex-end;">
+                    <button type="button" class="button" style="background: transparent; color: var(--muted); border: 1px solid var(--line);" onclick="fecharModalEdicao()">Cancelar</button>
+                    <button type="submit" class="button button-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    </main>
 <script>
-const inicio=document.querySelector('#data_hora'),duracao=document.querySelector('#duracao_minutos'),fimPrevisto=document.querySelector('#fim-previsto');function atualizarFimPrevisto(){if(!inicio.value||!duracao.value){fimPrevisto.textContent='Escolha o horário para ver o término.';return}const fim=new Date(inicio.value);fim.setMinutes(fim.getMinutes()+Number(duracao.value));fimPrevisto.textContent='Termina em '+fim.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}inicio.addEventListener('input',atualizarFimPrevisto);duracao.addEventListener('input',atualizarFimPrevisto);</script></body></html>
+const inicio=document.querySelector('#data_hora'),duracao=document.querySelector('#duracao_minutos'),fimPrevisto=document.querySelector('#fim-previsto');
+
+function atualizarFimPrevisto()
+    {if(!inicio.value||!duracao.value){fimPrevisto.textContent='Escolha o horário para ver o término.';return}const fim=new Date(inicio.value);fim.setMinutes(fim.getMinutes()+Number(duracao.value));fimPrevisto.textContent='Termina em '+fim.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}inicio.addEventListener('input',atualizarFimPrevisto);duracao.addEventListener('input',atualizarFimPrevisto);
+const modalEditar = document.getElementById('modal-editar');
+const formEditar = document.getElementById('form-editar');
+const editDataHora = document.getElementById('edit_data_hora');
+
+function abrirModalEdicao(id, dataHoraAtual) {
+    formEditar.action = `/agendamentos/${id}/editar`;
+    editDataHora.value = dataHoraAtual;
+    modalEditar.showModal();
+}
+
+function fecharModalEdicao() {
+    modalEditar.close();
+}
+</script></body></html>

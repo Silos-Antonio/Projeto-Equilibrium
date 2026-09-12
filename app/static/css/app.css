@@ -668,6 +668,17 @@ td:first-child {
     background: #f4f8f2;
 }
 
+#botao-iniciar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;           /* Espaço entre o texto e a seta */
+    white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+    width: max-content;  /* O botão terá o tamanho exato do texto + seta */
+    margin: 20px auto;   /* Centraliza o botão horizontalmente */
+    padding: 12px 32px;  /* Deixa o botão com um respiro interno confortável */
+}
+
 .status {
     border-radius: 99px;
     display: inline-block;
@@ -716,6 +727,66 @@ td:first-child {
 .msg.error,
     .erro {
     background: #f8e8e5;
+    color: var(--danger);
+}
+
+/* =========================================
+   PAGINAÇÃO
+   ========================================= */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.pagination .page-info {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.pagination .btn-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: transparent;
+    border: 1px solid var(--line);
+}
+
+/* =========================================
+   MODAL DIALOG
+   ========================================= */
+.modal {
+    border: none;
+    border-radius: var(--radius);
+    padding: 0;
+    background: transparent;
+    box-shadow: var(--shadow);
+    margin: auto;
+    max-width: 420px;
+    width: 100%;
+}
+
+.modal::backdrop {
+    background: rgba(44, 53, 49, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--muted);
+    padding: 0;
+    width: auto;
+}
+
+.btn-close:hover {
     color: var(--danger);
 }
 
@@ -842,8 +913,10 @@ button:active {
 
 /* The patient-facing mindful session */
 .session-page {
-    background: white;
-    background: radial-gradient(125% 125% at 50% 10%, #fff 40%, #63e 100%);;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -1278,6 +1351,7 @@ button:active {
 .crystal-img:nth-child(5) { animation-name: chakraLaringeo; }   /* 5. Azul */
 .crystal-img:nth-child(6) { animation-name: chakraFrontal; }    /* 6. Índigo */
 .crystal-img:nth-child(7) { animation-name: chakraCoronario; }  /* 7. Violeta */
+
 
 /* 1. Raiz (0s a 5s) */
 @keyframes chakraRaiz {

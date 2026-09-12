@@ -47,7 +47,9 @@
     <a href="{{ url_for('dashboard.index') }}">Visão geral</a>
     <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
     <a class="active" href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
-    <a href="{{ url_for('admin.usuarios') }}">Administração</a>
+    {% if session.get('perfil') == 'ADMIN' %}
+        <a href="{{ url_for('admin.usuarios') }}">Administração</a>
+    {% endif %}
 </nav>
 
 
@@ -71,7 +73,7 @@
                         <input id="telefone" name="telefone">
                         <label for="observacoes">Observações</label>
                         <textarea id="observacoes" name="observacoes" rows="4"></textarea>
-                        <button type="submit">Cadastrar paciente</button>
+                        <button type="submit" class="button button-primary form-submit">Cadastrar paciente</button>
                     </form>
                 </section>
                 <section class="card">
@@ -101,6 +103,44 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- ========================================== -->
+                    <!-- CONTROLES DE PAGINAÇÃO -->
+                    <!-- ========================================== -->
+                    {% if total_pages > 1 %}
+                    <div class="pagination" style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
+                        
+                        <!-- Botão Anterior -->
+                        {% if page > 1 %}
+                            <a href="{{ url_for('paciente.gerir_pacientes', page=page-1) }}" class="button" style="text-decoration: none; padding: 6px 12px; background: transparent; color: var(--muted); border: 1px solid var(--line);">
+                                &larr; Anterior
+                            </a>
+                        {% else %}
+                            <!-- Botão desativado (opcional para manter a simetria visual) -->
+                            <span class="button" style="padding: 6px 12px; background: transparent; color: var(--line); border: 1px solid var(--line); cursor: not-allowed; opacity: 0.5;">
+                                &larr; Anterior
+                            </span>
+                        {% endif %}
+
+                        <span style="display: flex; align-items: center; font-size: 0.9rem; color: var(--muted);">
+                            Página {{ page }} de {{ total_pages }}
+                        </span>
+
+                        <!-- Botão Próxima -->
+                        {% if page < total_pages %}
+                            <a href="{{ url_for('paciente.gerir_pacientes', page=page+1) }}" class="button" style="text-decoration: none; padding: 6px 12px; background: transparent; color: var(--muted); border: 1px solid var(--line);">
+                                Próxima &rarr;
+                            </a>
+                        {% else %}
+                            <!-- Botão desativado -->
+                            <span class="button" style="padding: 6px 12px; background: transparent; color: var(--line); border: 1px solid var(--line); cursor: not-allowed; opacity: 0.5;">
+                                Próxima &rarr;
+                            </span>
+                        {% endif %}
+
+                    </div>
+                    {% endif %}
+
                 </section>
             </main>
         </body>

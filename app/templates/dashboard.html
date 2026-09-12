@@ -99,7 +99,7 @@
 <div class="header-actions">
 
     <span class="avatar">
-        T
+        {{ (session.get('nome') or 'T')[0]|upper }}
     </span>
 
     <a
@@ -130,7 +130,7 @@
         </p>
 
         <h1>
-            Bom dia, terapeuta.
+            Bom dia, {{ session.get('nome') or 'terapeuta' }}.
         </h1>
 
         <p>

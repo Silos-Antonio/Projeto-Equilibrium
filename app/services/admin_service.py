@@ -1,6 +1,6 @@
 from app.services.db import get_db_connection
 import mysql.connector
-
+import bcrypt
 
 def listar_usuarios():
     """Retorna todos os usuários cadastrados no sistema."""
@@ -190,6 +190,59 @@ def atualizar_terapeuta(usuario_id, nome, email, telefone):
         print(f'Erro ao atualizar terapeuta: {error}')
 
         return False, 'Não foi possível atualizar os dados do terapeuta.'
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def redefinir_senha_terapeuta(usuario_id, nova_senha):
+    """Redefine a senha de um terapeuta pelo painel administrativo."""
+    conn = get_db_connection()
+    if not conn:
+        return False, 'Não foi possível conectar ao banco de dados.'
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Garante que o usuário existe e é um terapeuta
+        cursor.execute(
+            """
+            SELECT id, perfil
+            FROM usuarios
+            WHERE id = %s
+            """,
+            (usuario_id,)
+        )
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            return False, 'Usuário não encontrado.'
+
+        if usuario['perfil'] != 'TERAPEUTA':
+            return False, 'Apenas a senha de terapeutas pode ser redefinida aqui.'
+
+        # Gera o hash seguro da nova senha utilizando bcrypt
+        senha_hash = bcrypt.hashpw(
+            nova_senha.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+
+        cursor.execute(
+            """
+            UPDATE usuarios
+            SET senha = %s
+            WHERE id = %s
+            """,
+            (senha_hash, usuario_id)
+        )
+
+        conn.commit()
+        return True, 'Senha redefinida com sucesso.'
+
+    except mysql.connector.Error as error:
+        conn.rollback()
+        print(f'Erro ao redefinir senha: {error}')
+        return False, 'Não foi possível redefinir a senha.'
 
     finally:
         cursor.close()
