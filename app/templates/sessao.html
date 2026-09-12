@@ -18,12 +18,17 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/app.css') }}"
     />
+
+    <style>
+      body.session-page {
+        background-image: url("{{ url_for('static', filename='img/' ~ imagem_fundo) }}");
+        background-size: cover;
+        background-position: center;
+      }
+    </style>
   </head>
 
-  <body
-    class="session-page"
-    style="background-image: url('{{ url_for('static', filename='img/' ~ imagem_fundo) }}');">
-    
+  <body class="session-page">    
     <main class="session-box {% if status == 'ativa' %}pulse-chakra{% endif %}">
       <!-- ============================== -->
       <!-- MARCA -->
@@ -587,7 +592,7 @@ async function restaurarMusica() {
         document.querySelector('.session-box').classList.add('pulse-chakra');
 
           iniciarTimer(
-              {{ fim_timestamp }}
+              "{{ fim_timestamp }}"
           );
 
           restaurarMusica();
