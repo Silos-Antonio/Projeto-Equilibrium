@@ -133,6 +133,15 @@ label span {
     max-width: 1240px;
 }
 
+.menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--sage-dark);
+    padding: 8px;
+    cursor: pointer;
+}
+
 .brand {
     align-items: center;
     color: var(--ink);
@@ -811,6 +820,7 @@ td:first-child {
 
 .form-actions {
     align-items: center;
+    flex-direction: column-reverse;
     display: flex;
     gap: 15px;
     justify-content: flex-end;
@@ -1413,17 +1423,172 @@ audio {
     display: none;
 }
 
+.mobile-logout {
+    display: none;
+}
+
 @media(max-width:800px) {
-    .app-page{padding: 0 17px 28px}.header{height:auto;
-    min-height: 71px}.nav-links{margin-left:15px}.nav-links a{padding:8px}.header-actions .avatar{display:none}.page-intro{padding:35px 0 25px}.stats{grid-template-columns:1fr 1fr}.dashboard-grid,.schedule-layout,.container,.layout{grid-template-columns:1fr}.patient-row{grid-template-columns:34px 1fr auto}.patient-row>span:not(.patient-avatar){display:none}.patient-row time{font-size:.67rem}.booking-form{max-width:none}.schedule-board{overflow:hidden};
+    .app-page { padding: 0 17px 28px; }
+    
+    .header {
+        height: auto;
+        min-height: 71px;
+        position: relative; /* Necessário para ancorar o menu suspenso */
+        flex-wrap: wrap;
+    }
+
+    /* Exibe o botão e o empurra para a direita */
+    .menu-toggle {
+        display: flex;
+        margin-left: auto;
+        order: 2;
+    }
+
+    /* Mantém as ações do header alinhadas à direita, antes do menu */
+    .header-actions {
+        order: 1;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+    
+    .header-actions .avatar { display: none; }
+
+    /* Transforma a navegação em um Dropdown absoluto */
+    .nav-links {
+        display: none; /* Escondido por padrão */
+        flex-direction: column;
+        position: absolute;
+        top: 100%; /* Fixa exatamente abaixo do header */
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        padding: 10px 0;
+        margin-left: 0;
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 12px 38px rgba(51,65,55,.07); /* Reaproveitando seu --shadow */
+        z-index: 100;
+    }
+
+    /* Classe que o JavaScript vai ativar */
+@media(max-width:800px) {
+    /* ... suas outras regras do header continuam aqui ... */
+
+    .nav-links.active {
+        display: flex !important;
+        flex-direction: column; /* Garante que fiquem um embaixo do outro */
+        gap: 0;
+    }
+
+    /* A regra abaixo forçará os links a aparecerem */
+    .nav-links a {
+        display: block !important; /* Sobrescreve qualquer display: none antigo */
+        width: 100%; /* Faz o link ocupar toda a largura clicável */
+        font-size: 1rem; /* Um pouco maior para facilitar o toque no celular */
+        padding: 15px 28px;
+        color: var(--sage-dark, #2d3b31) !important; /* Garante que o texto fique escuro e visível */
+        text-decoration: none;
+        border-radius: 0;
+        border-left: 4px solid transparent;
+        box-sizing: border-box; /* Evita que o padding estoure a largura */
+    }
+
+    .nav-links a.active,
+    .nav-links a:hover {
+        background: var(--sage-pale);
+        border-left-color: var(--sage);
+    }
+}
+    .nav-links a.active,
+    .nav-links a:hover {
+        background: var(--sage-pale);
+        box-shadow: none; /* Remove a sombra azul do hover no desktop */
+        border-left-color: var(--sage); /* Destaque sutil na lateral */
+    }
+
+    .dashboard-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .schedule-layout {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .layout {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-links a.mobile-logout {
+        display: block !important;
+        margin-top: 10px; /* Dá um respiro dos outros links */
+        border-top: 1px solid var(--line, #e2e8f0); /* Cria uma linha divisória */
+        color: #d9534f !important; /* Um tom avermelhado sutil para indicar saída (opcional) */
+        font-weight: 500;
+    }
 }
 
 @media(max-width:560px) {
-    .header{align-items: center}.brand small,.btn-logout{display:none}.nav-links{gap:1px;
-    margin-left: auto}.nav-links a{font-size:.75rem;
-    padding: 7px}.page-intro{align-items:flex-start;
-    flex-direction: column;
-    gap: 18px}.stats{grid-template-columns:1fr 1fr}.stat-card{min-height:105px;
-    padding: 14px}.stat-icon{display:none}.stat-value{font-size:1.5rem}.card{padding:18px}.chart{height:160px}.period-pill{display:none}.schedule-table th:nth-child(3),.schedule-table td:nth-child(3){display:none}.schedule-table th,.schedule-table td{padding:12px 5px}.session-box{padding:34px 21px}.session-brand{margin-bottom:30px}.patient-row{gap:8px}.recent-card{padding:18px 12px}.recent-card .card-heading{padding:0 6px};
+    .header {
+        align-items: center
+    }
+    .brand small, .btn-logout {
+        display:none
+    }
+    .nav-links {
+        gap:1px;
+        margin-left: auto
+    }
+    .nav-links a {
+        font-size:.75rem;
+        padding: 7px
+    }
+    .page-intro {
+        align-items:flex-start;
+        flex-direction: column;
+        gap: 18px
+    }
+    .stats {
+        grid-template-columns:1fr 1fr
+    }
+    .stat-card {
+        min-height:105px;
+        padding: 14px
+    }
+    .stat-icon {
+        display:none
+    }
+    .stat-value {
+        font-size:1.5rem
+    }
+    .card {
+        padding:18px
+    }
+    .chart {
+        height:160px
+    }
+    .period-pill {
+        display:none
+    }
+    .schedule-table th:nth-child(3), .schedule-table td:nth-child(3) {
+        display:none
+    }
+    .schedule-table th,.schedule-table td {
+        padding:12px 5px
+    }.session-box {
+        padding:34px 21px
+    }
+    .session-brand {
+        margin-bottom:30px
+    }
+    .patient-row {
+        gap:8px
+    }
+    .recent-card {padding:18px 12px
+    }
+    .recent-card .card-heading {
+        padding:0 6px
+    };
 }
 

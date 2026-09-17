@@ -38,7 +38,7 @@
             <label for="observacoes">Observações</label>
             <textarea id="observacoes" name="observacoes" rows="5">{{ paciente.observacoes or '' }}</textarea>
             <div class="form-actions"><a href="{{ url_for('paciente.gerir_pacientes') }}">Cancelar</a>
-                <button type="submit">Salvar alterações</button>
+                <button type="submit" class="button button-primary form-submit">Salvar alterações</button>
             </div>
         </form>
     </main>

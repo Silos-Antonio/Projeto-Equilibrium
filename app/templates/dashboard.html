@@ -1,98 +1,61 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
-
 <head>
-
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>Painel • Equilibrium</title>
-
-<link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/app.css') }}"
->
-
-<link
-    rel="icon"
-    type="image/png"
-    href="{{ url_for('static', filename='img/icon.svg') }}"
->
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel • Equilibrium</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
 </head>
 
 <body class="app-page">
 
-<header class="header">
+    <header class="header">
+        <a class="brand" href="{{ url_for('dashboard.index') }}">
+            <span class="brand-mark">
+                <div class="brand-logo">
+                    <img src="{{ url_for('static', filename='img/icon.svg') }}" alt="icon">
+                </div>
+            </span>
 
+            <span>
+                equilibrium
+                <small>para terapeutas</small>
+            </span>
+        </a>
 
-<a
-    class="brand"
-    href="{{ url_for('dashboard.index') }}"
->
+    <!-- Adicionar o botão menu-toggle dentro do header -->
+        <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+            <!-- Ícone de hambúrguer simples em SVG -->
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
 
-    <span class="brand-mark">
+<nav class="nav-links" aria-label="Navegação principal">
 
-        <div class="brand-logo">
-
-            <img
-                src="{{ url_for('static', filename='img/icon.svg') }}"
-                alt="icon"
-            >
-
-        </div>
-
-    </span>
-
-    <span>
-        equilibrium
-        <small>para terapeutas</small>
-    </span>
-
-</a>
-
-
-<nav
-    class="nav-links"
-    aria-label="Navegação principal"
->
-
-    <a
-        class="active"
-        href="{{ url_for('dashboard.index') }}"
-    >
+    <a class="active" href="{{ url_for('dashboard.index') }}">
         Visão geral
     </a>
 
-    <a
-        href="{{ url_for('agendamento.gerir_agendamentos') }}"
-    >
+    <a href="{{ url_for('agendamento.gerir_agendamentos') }}">
         Agenda
     </a>
 
-    <a
-        href="{{ url_for('paciente.gerir_pacientes') }}"
-    >
+    <a href="{{ url_for('paciente.gerir_pacientes') }}">
         Pacientes
     </a>
 
     {% if session.get('perfil') == 'ADMIN' %}
-
-        <a
-            href="{{ url_for('admin.usuarios') }}"
-        >
-            Administração
-        </a>
-
+    <a href="{{ url_for('admin.usuarios') }}">
+        Administração
+    </a>
     {% endif %}
 
+    <a href="{{ url_for('auth.logout') }}" class="mobile-logout">
+        Sair</a>
 </nav>
 
 
@@ -658,9 +621,7 @@
 
 </main>
 
-<script
-    src="{{ url_for('static', filename='js/dashboard.js') }}"
-></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
 </body>
 
