@@ -1,28 +1,39 @@
-import mysql.connector
-from mysql.connector import Error
+import logging
 import os
 
+import mysql.connector
+from mysql.connector import Error
+
+
+logger = logging.getLogger(__name__)
+
+
 def get_db_connection():
-    # Depuração: Vamos ver o que está sendo lido das variáveis
-    host = os.getenv("DB_HOST")
-    user = os.getenv("DB_USER")
-    pw = os.getenv("DB_PASS")
-    db = os.getenv("DB_NAME")
-    
-    print(f"DEBUG: Tentando conectar com Host={host}, User={user}, Pass={'[OCULTO]' if pw else '[VAZIO]'}, DB={db}")
+    host = os.getenv('DB_HOST')
+    user = os.getenv('DB_USER')
+    password = os.getenv('DB_PASS')
+    database = os.getenv('DB_NAME')
+
+    if not all([host, user, database]):
+        logger.error('Configuração do banco de dados incompleta.')
+        return None
 
     try:
         connection = mysql.connector.connect(
             host=host,
             user=user,
-            password=pw if pw else "", # Garante string vazia se for None
-            database=db
+            password=password or '',
+            database=database,
         )
 
         if connection.is_connected():
             return connection
-        else:
-            return None
-    except Error as e:
-        print(f"Erro ao conectar ao MySQL: {e}")
+
+        return None
+
+    except Error as error:
+        logger.error(
+            'Erro ao conectar ao MySQL: %s',
+            error,
+        )
         return None
