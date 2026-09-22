@@ -1,6 +1,6 @@
 # Ambiente Virtual
 venv/
-
+venv-test/
 # Variáveis de Ambiente e Configurações Sensíveis
 .env
 instance/
