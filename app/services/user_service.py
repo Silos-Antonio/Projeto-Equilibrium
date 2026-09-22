@@ -82,3 +82,88 @@ def criar_admin(nome, email, telefone, senha):
         senha=senha,
         perfil='ADMIN'
     )
+
+def existe_admin():
+    conn = get_db_connection()
+
+    if not conn:
+        return False
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            """
+            SELECT id
+            FROM usuarios
+            WHERE perfil = 'ADMIN'
+            LIMIT 1
+            """
+        )
+
+        return cursor.fetchone() is not None
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def criar_admin(nome, email, telefone, senha):
+    conn = get_db_connection()
+
+    if not conn:
+        return False, 'Não foi possível conectar ao banco de dados.'
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            """
+            SELECT id
+            FROM usuarios
+            WHERE email = %s
+               OR telefone = %s
+            LIMIT 1
+            """,
+            (email, telefone)
+        )
+
+        if cursor.fetchone():
+            return False, 'E-mail ou telefone já cadastrado.'
+
+        senha_hash = bcrypt.hashpw(
+            senha.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+
+        cursor.execute(
+            """
+            INSERT INTO usuarios (
+                nome,
+                email,
+                telefone,
+                senha,
+                perfil,
+                situacao
+            )
+            VALUES (%s, %s, %s, %s, 'ADMIN', 'ATIVO')
+            """,
+            (
+                nome,
+                email,
+                telefone,
+                senha_hash,
+            )
+        )
+
+        conn.commit()
+
+        return True, None
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        conn.close()
