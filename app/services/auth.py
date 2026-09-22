@@ -1,34 +1,33 @@
-from app.services.db import get_db_connection
-
 import bcrypt
 
-
 from app.services.db import get_db_connection
-import bcrypt
+
 
 def verificar_credenciais(email, senha):
     conn = get_db_connection()
+
     if not conn:
         return None
-    
+
     cursor = conn.cursor(dictionary=True)
 
-    query = """
-        SELECT id, nome, senha, perfil, situacao
-        FROM usuarios
-        WHERE email = %s
-    """
+    try:
+        query = """
+            SELECT id, nome, senha, perfil, situacao
+            FROM usuarios
+            WHERE email = %s
+        """
 
-    cursor.execute(query, (email,))
-    usuario = cursor.fetchone()
+        cursor.execute(query, (email,))
+        usuario = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
+    finally:
+        cursor.close()
+        conn.close()
 
     if not usuario:
         return None
 
-    # Valida a senha com bcrypt
     senha_valida = bcrypt.checkpw(
         senha.encode('utf-8'),
         usuario['senha'].encode('utf-8')
@@ -37,5 +36,34 @@ def verificar_credenciais(email, senha):
     if not senha_valida:
         return None
 
-    # Retorna o dicionário completo do usuário se tudo estiver correto
+    if usuario['situacao'] != 'ATIVO':
+        return None
+
     return usuario
+
+
+def buscar_usuario_ativo_por_id(usuario_id):
+    """Retorna o usuário da sessão somente se ele ainda estiver ativo."""
+    conn = get_db_connection()
+
+    if not conn:
+        return None
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute(
+            """
+            SELECT id, nome, perfil
+            FROM usuarios
+            WHERE id = %s
+              AND situacao = 'ATIVO'
+            """,
+            (usuario_id,)
+        )
+
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        conn.close()

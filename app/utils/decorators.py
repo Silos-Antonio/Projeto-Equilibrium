@@ -1,43 +1,62 @@
 from functools import wraps
 
-from flask import session, redirect, url_for, flash
+from flask import flash, redirect, session, url_for
 
+from app.services.auth import buscar_usuario_ativo_por_id
+
+
+def _buscar_usuario_da_sessao():
+    """Valida no banco se o usuário da sessão ainda existe e está ativo."""
+    usuario_id = session.get('usuario_id')
+
+    if not usuario_id:
+        return None
+
+    usuario = buscar_usuario_ativo_por_id(usuario_id)
+
+    if not usuario:
+        session.clear()
+        return None
+
+    return usuario
 
 def login_required(f):
-    """
-    Decorador que verifica se o usuário está logado.
-
-    Se não estiver, bloqueia o acesso e manda de volta para o login.
-    """
+    """Exige uma sessão associada a um usuário que continue ativo."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        usuario = _buscar_usuario_da_sessao()
 
-        if 'usuario_id' not in session:
-            flash('Acesso negado. Por favor, faça login.', 'error')
+        if not usuario:
+            flash(
+                'Acesso negado. Por favor, faça login.',
+                'error'
+            )
             return redirect(url_for('auth.login'))
 
         return f(*args, **kwargs)
 
     return decorated_function
 
-
 def admin_required(f):
-    """
-    Decorador que verifica se o usuário possui perfil de administrador.
-    """
+    """Exige um usuário ativo com perfil de administrador."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        usuario = _buscar_usuario_da_sessao()
 
-        # Primeiro verifica se existe um usuário autenticado
-        if 'usuario_id' not in session:
-            flash('Acesso negado. Por favor, faça login.', 'error')
+        if not usuario:
+            flash(
+                'Acesso negado. Por favor, faça login.',
+                'error'
+            )
             return redirect(url_for('auth.login'))
 
-        # Depois verifica se o usuário é administrador
-        if session.get('perfil') != 'ADMIN':
-            flash('Você não tem permissão para acessar esta área.', 'error')
+        if usuario['perfil'] != 'ADMIN':
+            flash(
+                'Você não tem permissão para acessar esta área.',
+                'error'
+            )
             return redirect(url_for('dashboard.index'))
 
         return f(*args, **kwargs)
