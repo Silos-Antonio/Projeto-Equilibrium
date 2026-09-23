@@ -1,6 +1,7 @@
 # Ambiente Virtual
 venv/
 venv-test/
+.pytest_cache/
 # Variáveis de Ambiente e Configurações Sensíveis
 .env
 instance/
