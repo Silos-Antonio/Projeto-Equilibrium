@@ -1,64 +1,12 @@
-<!DOCTYPE html>
-
-<html lang="pt-BR">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Usuários • Equilibrium</title>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
-
-</head>
-
-<body class="app-page">
-
-    <header class="header">
+{% extends "app_base.html" %}
 
 
-        <a class="brand" href="{{ url_for('dashboard.index') }}">
-            <span class="brand-mark">
-                <span class="brand-logo">
-                    <img src="{{ url_for('static', filename='img/icon.svg') }}" alt="icon">
-                </span>
-            </span>
-
-            <span>
-                equilibrium<small>para terapeutas</small>
-            </span>
-        </a>
-
-                <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
-            <!-- Ícone de hambúrguer simples em SVG -->
-            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
-
-        <nav class="nav-links" aria-label="Navegação principal">
-
-            <a href="{{ url_for('dashboard.index') }}"> Visão geral</a>
-            <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
-            <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
-            <a class="active" href="{{ url_for('admin.usuarios') }}">Administração</a>
-            <a href="{{ url_for('auth.logout') }}" class="mobile-logout">Sair</a>
-
-        </nav>
+{% block title %}
+Usuários • Equilibrium
+{% endblock %}
 
 
-        <div class="header-actions">
-
-            <span class="avatar">A</span>
-            <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
-
-        </div>
-
-</header>
+{% block app_content %}
 
 <main class="page-shell">
 
@@ -299,35 +247,6 @@
 
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+{% endblock %}
 
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', (evento) => {
-            // Impede que o clique suba para o documento e acione o fechamento
-            evento.stopPropagation(); 
-            
-            navLinks.classList.toggle('active');
-            console.log('Menu clicado! A classe active está:', navLinks.classList.contains('active'));
-            
-            const isOpen = navLinks.classList.contains('active');
-            menuToggle.setAttribute('aria-expanded', isOpen);
-        });
 
-        document.addEventListener('click', (evento) => {
-            if (!menuToggle.contains(evento.target) && !navLinks.contains(evento.target)) {
-                navLinks.classList.remove('active');
-                menuToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-    } else {
-        console.error('Erro: Botão .menu-toggle ou .nav-links não encontrados.');
-    }
-});
-</script>
-
-</body>
-
-</html>

@@ -1,38 +1,126 @@
-<!DOCTYPE html><html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login - Equilibrium</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/icon.svg') }}">
-    </head>
-    
-    <body class="login-page">
-        <main class="login-container">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo-equilibrium">
-            </div>
-            <div class="messages">{% with messages = get_flashed_messages(category_filter=['error']) %}{% for message in messages %}<div class="msg error">{{ message }}
+{% extends "base.html" %}
 
-            </div>{% endfor %}{% endwith %}</div>
-            <form method="post" action="{{ url_for('auth.login') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <label for="email">E-mail</label>
-                <input id="email" name="email" type="email" required autofocus placeholder="seu@email.com">
-                <label for="senha">Senha</label>
-                <input id="senha" name="senha" type="password" required placeholder="••••••••"> 
-                <button><span class="text">Bem vindo!</span></button>
 
-            </form>
-             <footer style="text-align: center; margin-top: 24px; font-size: 0.75rem; color: var(--muted);">
-                <p style="margin: 0;">
-                    &copy; 2026 Equilibrium. Todos os direitos reservados.<br> 
-                    <span style="margin: 0 6px;">•</span>
-                    <a href="{{ url_for('auth.termos_de_uso') }}" target="_blank" style="color: var(--muted); text-decoration: underline;">Termos de Uso</a>
-                    <span style="margin: 0 6px;">•</span>
-                    <a href="{{ url_for('auth.politica_de_privacidade') }}" target="_blank" style="color: var(--muted); text-decoration: underline;">Privacidade</a>
-                </p>
-            </footer>
-        </main>
-    </body>
-    </html>
+{% block title %}
+Login • Equilibrium
+{% endblock %}
+
+
+{% block body_class %}
+login-page
+{% endblock %}
+
+
+{% block content %}
+
+<main class="login-container">
+
+    <div class="logo">
+        <img
+            src="{{ url_for('static', filename='img/logo.png') }}"
+            alt="Logo Equilibrium"
+        >
+    </div>
+
+    <div class="messages">
+        {% with messages = get_flashed_messages(category_filter=['error']) %}
+
+            {% for message in messages %}
+                <div class="msg error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+        {% endwith %}
+    </div>
+
+    <form
+        method="post"
+        action="{{ url_for('auth.login') }}"
+    >
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <label for="email">
+            E-mail
+        </label>
+
+        <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autofocus
+            placeholder="seu@email.com"
+        >
+
+        <label for="senha">
+            Senha
+        </label>
+
+        <input
+            id="senha"
+            name="senha"
+            type="password"
+            required
+            placeholder="••••••••"
+        >
+
+        <button type="submit">
+            <span class="text">
+                Bem vindo!
+            </span>
+        </button>
+    </form>
+
+    <footer
+        style="
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.75rem;
+            color: var(--muted);
+        "
+    >
+        <p style="margin: 0;">
+            &copy; 2026 Equilibrium. Todos os direitos reservados.
+
+            <br>
+
+            <span style="margin: 0 6px;">
+                •
+            </span>
+
+            <a
+                href="{{ url_for('auth.termos_de_uso') }}"
+                target="_blank"
+                style="
+                    color: var(--muted);
+                    text-decoration: underline;
+                "
+            >
+                Termos de Uso
+            </a>
+
+            <span style="margin: 0 6px;">
+                •
+            </span>
+
+            <a
+                href="{{ url_for('auth.politica_de_privacidade') }}"
+                target="_blank"
+                style="
+                    color: var(--muted);
+                    text-decoration: underline;
+                "
+            >
+                Privacidade
+            </a>
+        </p>
+    </footer>
+
+</main>
+
+{% endblock %}
