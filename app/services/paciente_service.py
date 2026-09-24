@@ -94,7 +94,7 @@ def atualizar_paciente(terapeuta_id, paciente_id, nome, email, telefone, observa
     except mysql.connector.Error as error:
         conn.rollback()
         if error.errno == 1062:
-            return False, 'Este telefone já está cadastrado para outro paciente.'
+            return False, 'Este telefone já está cadastrado para outro paciente deste terapeuta.'
         return False, 'Não foi possível atualizar o paciente.'
     finally:
         cursor.close()

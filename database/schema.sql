@@ -35,7 +35,7 @@ CREATE TABLE `agendamentos` (
   KEY `idx_agendamento_paciente` (`paciente_id`),
   KEY `idx_agendamento_terapeuta` (`terapeuta_id`),
   KEY `idx_agendamento_inicio` (`data_hora_inicio`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,14 +47,14 @@ DROP TABLE IF EXISTS `pacientes`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pacientes` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `terapeuta_id` int DEFAULT NULL,
+  `terapeuta_id` int NOT NULL,
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `telefone` varchar(20) NOT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
   `observacoes` text,
   `criado_em` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `telefone` (`telefone`),
+  UNIQUE KEY `uq_pacientes_terapeuta_telefone` (`terapeuta_id`,`telefone`),
   KEY `idx_paciente_terapeuta` (`terapeuta_id`),
   CONSTRAINT `fk_pacientes_terapeuta` FOREIGN KEY (`terapeuta_id`) REFERENCES `usuarios` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -80,23 +80,7 @@ CREATE TABLE `sessoes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `agendamento_id` (`agendamento_id`),
   UNIQUE KEY `token_acesso` (`token_acesso`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `terapeuta_paciente`
---
-
-DROP TABLE IF EXISTS `terapeuta_paciente`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `terapeuta_paciente` (
-  `terapeuta_id` int NOT NULL,
-  `paciente_id` int NOT NULL,
-  `criado_em` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`terapeuta_id`,`paciente_id`),
-  KEY `paciente_id` (`paciente_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,4 +118,4 @@ CREATE TABLE `usuarios` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-22 17:25:15
+-- Dump completed on 2026-09-24  2:06:29

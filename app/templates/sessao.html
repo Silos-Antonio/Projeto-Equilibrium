@@ -366,10 +366,22 @@ async function restaurarMusica() {
       // TIMER
       // ==================================
 
-      function iniciarTimer(fimTimestamp) {
+function iniciarTimer(fimTimestamp) {
 
-          const fim =
-              new Date(fimTimestamp);
+    const timestamp =
+        Number(fimTimestamp);
+
+    if (!Number.isFinite(timestamp)) {
+
+        if (timer) {
+            timer.textContent = '--:--';
+        }
+
+        return;
+    }
+
+    const fim =
+        new Date(timestamp);
 
 
           function atualizarTimer() {
@@ -589,15 +601,16 @@ async function restaurarMusica() {
 
       if (statusSessao === 'ativa') {
 
-        document.querySelector('.session-box').classList.add('pulse-chakra');
+    document
+        .querySelector('.session-box')
+        .classList.add('pulse-chakra');
 
-          iniciarTimer(
-              "{{ fim_timestamp }}"
-          );
+    const fimTimestamp = "{{ fim_timestamp }}";
 
-          restaurarMusica();
+    iniciarTimer(fimTimestamp);
 
-      }
+    restaurarMusica();
+}
     </script>
 
     {% endif %}

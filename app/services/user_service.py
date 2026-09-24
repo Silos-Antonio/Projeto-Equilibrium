@@ -71,18 +71,6 @@ def criar_terapeuta(nome, email, telefone, senha):
         perfil='TERAPEUTA'
     )
 
-
-def criar_admin(nome, email, telefone, senha):
-    """Cria um usuário com perfil de administrador."""
-
-    return criar_usuario(
-        nome=nome,
-        email=email,
-        telefone=telefone,
-        senha=senha,
-        perfil='ADMIN'
-    )
-
 def existe_admin():
     conn = get_db_connection()
 

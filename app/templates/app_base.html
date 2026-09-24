@@ -88,14 +88,16 @@ app-page
         {% if session.get('perfil') == 'ADMIN' %}
             <a
                 href="{{ url_for('admin.usuarios') }}"
-                {% if request.blueprint == 'admin' %}
+                {% if
+                    request.blueprint == 'admin'
+                    or request.endpoint == 'auth.cadastro_terapeuta'
+                %}
                     class="active"
                 {% endif %}
             >
                 Administração
             </a>
         {% endif %}
-
         <a
             href="{{ url_for('auth.logout') }}"
             class="mobile-logout"

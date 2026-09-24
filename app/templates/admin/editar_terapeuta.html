@@ -1,63 +1,12 @@
-<!DOCTYPE html>
+{% extends "app_base.html" %}
 
-<html lang="pt-BR">
 
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block title %}
+Editar terapeuta • Equilibrium
+{% endblock %}
 
-    <title>Editar Terapeuta • Equilibrium</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/app.css') }}"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        href="{{ url_for('static', filename='img/icon.svg') }}"
-    >
-</head>
-
-<body class="app-page">
-
-    <header class="header">
-        <a
-            class="brand"
-            href="{{ url_for('dashboard.index') }}"
-        >
-            <span class="brand-mark">
-                <span class="brand-logo">
-                    <img
-                        src="{{ url_for('static', filename='img/icon.svg') }}"
-                        alt="icon"
-                    >
-                </span>
-            </span>
-            <span>equilibrium<small>para terapeutas</small></span>
-        </a>
-
-        <nav class="nav-links" aria-label="Navegação principal">
-            <a href="{{ url_for('dashboard.index') }}">Visão geral</a>
-            <a href="{{ url_for('agendamento.gerir_agendamentos') }}">Agenda</a>
-            <a href="{{ url_for('paciente.gerir_pacientes') }}">Pacientes</a>
-            {% if session.get('perfil') == 'ADMIN' %}
-                <a class="active" href="{{ url_for('admin.usuarios') }}">Administração</a>
-            {% endif %}
-        </nav>
-
-        <div class="header-actions">
-            <span class="avatar">
-                {{ (session.get('nome') or 'A')[0]|upper }}
-            </span>
-            <a class="btn-logout" href="{{ url_for('auth.logout') }}">Sair</a>
-        </div>
-    </header>
-
+{% block app_content %}
     <main class="layout">
         <section class="card" style="max-width: 600px; margin: 0 auto; width: 100%;">
             <h2>Editar terapeuta</h2>
@@ -134,6 +83,4 @@
         </section>
     </main>
 
-</body>
-
-</html>
+    {% endblock %}
