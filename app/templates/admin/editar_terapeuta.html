@@ -11,16 +11,6 @@ Editar terapeuta • Equilibrium
         <section class="card" style="max-width: 600px; margin: 0 auto; width: 100%;">
             <h2>Editar terapeuta</h2>
 
-            <div class="messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% for category, message in messages %}
-                        <div class="msg {{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endwith %}
-            </div>
-
             <form
                 method="POST"
                 action="{{ url_for('admin.editar_usuario', usuario_id=usuario.id) }}"

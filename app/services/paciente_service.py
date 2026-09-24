@@ -2,6 +2,17 @@ import mysql.connector
 
 from app.services.db import get_db_connection
 
+import logging
+
+from mysql.connector import Error, IntegrityError
+
+from app.services.db import get_db_connection
+
+from app.utils.normalizer import normalizar_telefone
+
+
+logger = logging.getLogger(__name__)
+
 def listar_pacientes_do_terapeuta(terapeuta_id, limite=20, deslocamento=0):
     """
     Lista os pacientes cadastrados pelo terapeuta autenticado com paginação.
@@ -34,37 +45,87 @@ def listar_pacientes_do_terapeuta(terapeuta_id, limite=20, deslocamento=0):
     
     return pacientes, total_pacientes
 
-def criar_paciente(terapeuta_id, nome, email, telefone="", observacoes=""):
-    """
-    Salva um paciente associado ao terapeuta que o cadastrou.
-    """
+def criar_paciente(
+    terapeuta_id,
+    nome,
+    email,
+    telefone,
+    observacoes
+):
     conn = get_db_connection()
+
     if not conn:
-        return False
-        
+        return (
+            False,
+            'Não foi possível conectar ao banco de dados.'
+        )
+
     cursor = conn.cursor()
-    
+    telefone = normalizar_telefone(telefone)
+
     try:
-        query_paciente = """
-            INSERT INTO pacientes (terapeuta_id, nome, email, telefone, observacoes)
+        cursor.execute(
+            """
+            INSERT INTO pacientes (
+                terapeuta_id,
+                nome,
+                email,
+                telefone,
+                observacoes
+            )
             VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(query_paciente, (terapeuta_id, nome, email or None, telefone or None, observacoes or None))
+            """,
+            (
+                terapeuta_id,
+                nome,
+                email or None,
+                telefone or None,
+                observacoes or None,
+            )
+        )
 
         conn.commit()
-        sucesso = True
-        
-    except Exception as e:
+
+        return True, None
+
+    except IntegrityError as error:
         conn.rollback()
-        print(f"Erro ao inserir paciente: {e}")
-        sucesso = False
-        
+
+        if (
+            error.errno == 1062
+            and 'uq_pacientes_terapeuta_telefone'
+            in str(error)
+        ):
+            return (
+                False,
+                'Este telefone já está cadastrado '
+                'para outro paciente deste terapeuta.'
+            )
+
+        logger.exception(
+            'Erro de integridade ao cadastrar paciente.'
+        )
+
+        return (
+            False,
+            'Não foi possível cadastrar o paciente.'
+        )
+
+    except Error:
+        conn.rollback()
+
+        logger.exception(
+            'Erro ao cadastrar paciente.'
+        )
+
+        return (
+            False,
+            'Não foi possível cadastrar o paciente.'
+        )
+
     finally:
         cursor.close()
         conn.close()
-        
-    return sucesso
-
 
 def buscar_paciente_do_terapeuta(terapeuta_id, paciente_id):
     conn = get_db_connection()
@@ -83,7 +144,10 @@ def atualizar_paciente(terapeuta_id, paciente_id, nome, email, telefone, observa
     conn = get_db_connection()
     if not conn:
         return False, 'Não foi possível conectar ao banco de dados.'
+    
     cursor = conn.cursor()
+    telefone = normalizar_telefone(telefone)
+    
     try:
         cursor.execute('UPDATE pacientes SET nome = %s, email = %s, telefone = %s, observacoes = %s WHERE id = %s AND terapeuta_id = %s', (nome, email or None, telefone or None, observacoes or None, paciente_id, terapeuta_id))
         if cursor.rowcount != 1:

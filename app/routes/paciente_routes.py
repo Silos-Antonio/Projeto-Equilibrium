@@ -10,7 +10,7 @@ def gerir_pacientes():
     terapeuta_id = session.get('usuario_id')
 
     if request.method == 'POST':
-        # ... (seu código de salvar paciente continua igual aqui) ...
+        
         nome = request.form.get('nome')
         email = request.form.get('email')
         telefone = request.form.get('telefone')

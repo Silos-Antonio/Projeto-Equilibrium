@@ -124,6 +124,29 @@ app-page
 
 </header>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="messages page-shell">
+
+            {% for category, message in messages %}
+
+                <div
+                    class="msg {{ category }}"
+                    role="alert"
+                >
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
 
 {% block app_content %}{% endblock %}
 

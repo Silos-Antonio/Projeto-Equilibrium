@@ -19,22 +19,6 @@ Cadastrar terapeuta • Equilibrium
 
     <h1>Cadastro de Terapeuta</h1>
 
-    <div class="messages">
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-
-            {% for category, message in messages %}
-
-                <div class="msg {{ category }}">
-                    {{ message }}
-                </div>
-
-            {% endfor %}
-
-        {% endwith %}
-
-    </div>
-
     <form
         method="post"
         action="{{ url_for('auth.cadastro_terapeuta') }}"
