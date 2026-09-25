@@ -611,7 +611,5 @@ Desenvolvedor de software com foco em backend, APIs, bancos de dados e aplicaç�
 ---
 
 ## Licença
-
-A licença do código-fonte será definida antes da publicação pública do projeto.
-
-Os assets de áudio estão excluídos da licença de software e permanecem sujeitos às suas próprias condições de uso.
+O código-fonte do Equilibrium está licenciado sob a Licença MIT. Veja LICENSE para mais detalhes.
+Os arquivos de áudio localizados em app/sound/ estão excluídos da Licença MIT e estão sujeitos a restrições de uso separadas. Veja AUDIO_ASSETS_NOTICE.md.
