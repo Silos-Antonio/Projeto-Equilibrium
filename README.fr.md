@@ -609,7 +609,5 @@ Développeur logiciel orienté backend, API, bases de données et applications w
 ---
 
 ## Licence
-
-La licence du code source sera définie avant la publication publique du projet.
-
-Les ressources audio sont exclues de la licence logicielle et restent soumises à leurs propres conditions d'utilisation.
+Le code source d'Equilibrium est sous licence MIT. Consultez LICENSE pour plus de détails.
+Les fichiers audio situés dans app/sound/ sont exclus de la licence MIT et sont soumis à des restrictions d'utilisation distinctes. Consultez AUDIO_ASSETS_NOTICE.md.
