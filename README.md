@@ -1,6 +1,6 @@
 # Equilibrium
 
-🌐 **Language:** **English** | [Português](README.pt-BR.md) | [Français](README.fr.md)
+🌐 **Language:** **English** | [Français](README.fr.md) | [Português](README.pt-BR.md) 
 
 **A multi-user web application for therapists to manage patients, appointments and remote therapy sessions.**
 
