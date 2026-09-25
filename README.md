@@ -611,6 +611,6 @@ Software developer focused on backend development, APIs, databases and practical
 
 ## License
 
-The software license for the source code will be defined before the public release.
+The Equilibrium source code is licensed under the MIT License. See LICENSE for details.
 
-Audio assets are excluded from the software license and remain subject to their own usage restrictions.
+Audio files located in app/sound/ are excluded from the MIT License and are subject to separate usage restrictions. See AUDIO_ASSETS_NOTICE.md.
