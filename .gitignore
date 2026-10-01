@@ -9,3 +9,6 @@ instance/
 # Arquivos temporários do Python
 __pycache__/
 *.pyc
+
+# Pasta do certificado 
+.certs/

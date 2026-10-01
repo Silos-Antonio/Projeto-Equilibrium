@@ -5,3 +5,4 @@ bcrypt==5.0.0
 mysql-connector-python==9.7.0
 python-dotenv==1.2.2
 Werkzeug==3.1.8
+gunicorn==26.2.0
