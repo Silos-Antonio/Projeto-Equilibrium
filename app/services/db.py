@@ -1,10 +1,36 @@
 import os
 import logging
+import base64
+import tempfile
+from pathlib import Path
 
 import mysql.connector
 from mysql.connector import Error
 
 logger = logging.getLogger(__name__)
+
+
+def get_ssl_ca_path():
+    # Desenvolvimento local: usa o arquivo existente
+    ssl_ca = os.getenv('DB_SSL_CA')
+
+    if ssl_ca:
+        return ssl_ca
+
+    # Produção: recebe o certificado em Base64
+    ssl_ca_b64 = os.getenv('DB_SSL_CA_B64')
+
+    if not ssl_ca_b64:
+        return None
+
+    ca_path = Path(tempfile.gettempdir()) / 'aiven-ca.pem'
+
+    if not ca_path.exists():
+        ca_path.write_bytes(
+            base64.b64decode(ssl_ca_b64)
+        )
+
+    return str(ca_path)
 
 
 def get_db_connection():
@@ -13,7 +39,7 @@ def get_db_connection():
     user = os.getenv('DB_USER')
     password = os.getenv('DB_PASS')
     database = os.getenv('DB_NAME')
-    ssl_ca = os.getenv('DB_SSL_CA')
+    ssl_ca = get_ssl_ca_path()
     db_time_zone = os.getenv('DB_TIME_ZONE', '-03:00')
 
     if not all([host, user, database]):
