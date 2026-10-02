@@ -2,7 +2,7 @@
 
 🌐 **Idioma:** [English](README.md) | [Français](README.fr.md) | **Português** 
 
-**Uma aplicação web multiusuário desenvolvida para auxiliar terapeutas na gestão de pacientes, agendamentos e sessões de terapia à distância.**
+**Uma aplicação web multiusuário desenvolvida para auxiliar terapeutas holísticos, principalmente os que trabalham com aplicação de Reiki, na gestão de pacientes, agendamentos e sessões de terapia à distância.**
 
 Equilibrium é um projeto de portfólio desenvolvido com **Python, Flask e MySQL**, criado para ajudar terapeutas a organizar sua rotina de trabalho enquanto oferece aos pacientes uma experiência dedicada para sessões remotas.
 
@@ -25,7 +25,7 @@ O sistema também possui ferramentas administrativas para gerenciamento de conta
 
 * Centralizar o gerenciamento de pacientes
 * Organizar agendamentos
-* Disponibilizar uma experiência dedicada para sessões de terapia à distância
+* Disponibilizar uma experiência dedicada para sessões de terapia energética à distância
 * Isolar os dados entre terapeutas
 * Gerenciar o acesso dos terapeutas por meio de uma conta administrativa
 * Aplicar medidas práticas de segurança à autenticação e aos formulários
