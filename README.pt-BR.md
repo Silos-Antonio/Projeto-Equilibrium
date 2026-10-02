@@ -524,7 +524,7 @@ Nenhuma credencial real é armazenada no repositório.
 
 ### Detalhes do dashboard
 
-![Equilibrium dashboard](docs/screenshots/appointments-details.png)
+![Equilibrium dashboard](docs/screenshots/dashboard-details.png)
 
 ### Cadastro de pacientes
 
