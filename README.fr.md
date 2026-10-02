@@ -2,7 +2,7 @@
 
 🌐 **Langue :** [English](README.md) | **Français** | [Português](README.pt-BR.md) 
 
-**Une application web multi-utilisateur conçue pour aider les thérapeutes à gérer leurs patients, leurs rendez-vous et leurs séances de thérapie à distance.**
+**Une application web multi-utilisateur conçue pour aider les thérapeutes qui réalisent l'application de Reiki, à gérer leurs patients, leurs rendez-vous et leurs séances de thérapie à distance.**
 
 Equilibrium est un projet de portfolio développé avec **Python, Flask et MySQL**, conçu pour accompagner les thérapeutes dans l'organisation de leur activité quotidienne tout en offrant aux patients une expérience dédiée aux séances à distance.
 
