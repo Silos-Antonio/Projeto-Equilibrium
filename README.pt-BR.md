@@ -283,15 +283,17 @@ database/migrations/
 ## Instalação
 
 ### 1. Clone o repositório
+Crie uma pasta na sua própria máquina, navegue até ela pelo Git e execute o comando **git clone** colando o link do repositório do Equilibrium.
 
 ```bash id="fk7hg8"
-git clone <repository-url>
-cd equilibrium
+cd C:/<caminho_para_sua_pasta>
+git clone <URL_do_repositório>
 ```
 
 ---
 
 ### 2. Crie um ambiente virtual
+Execute os comando abaixo na sua IDE
 
 ```bash id="14l6qe"
 python -m venv venv
@@ -320,6 +322,7 @@ pip install -r requirements.txt
 ---
 
 ### 4. Crie o banco MySQL
+Execute o CREATE DATABASE pelo MySQL Workbench ou diretamente pelo terminal da sua IDE.
 
 ```sql id="kysxkq"
 CREATE DATABASE equilibrium
@@ -327,7 +330,7 @@ CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 ```
 
-Depois importe o schema:
+Depois importe o schema pelo terminal da sua IDE:
 
 ```sql id="lq8mcp"
 USE equilibrium;
@@ -348,7 +351,7 @@ Crie um arquivo `.env` com base em:
 Exemplo:
 
 ```env id="sekl9a"
-SECRET_KEY=replace-with-a-secure-secret-key
+SECRET_KEY=substitua pela sua secret key
 
 DB_HOST=localhost
 DB_USER=root
