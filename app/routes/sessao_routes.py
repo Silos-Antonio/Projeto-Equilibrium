@@ -1,5 +1,5 @@
-# app/routes/sessao_routes.py
-from datetime import datetime, timedelta
+from app.utils.time_utils import agora_local
+from datetime import timedelta
 from pathlib import Path
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
 from app.services.sessao_service import buscar_dados_sessao, encerrar_sessao, iniciar_sessao
@@ -48,7 +48,7 @@ def acessar_sessao(token):
     # DETERMINA O STATUS
     # ==========================================
 
-    agora = datetime.now()
+    agora = agora_local()
 
     fim_timestamp = None
 

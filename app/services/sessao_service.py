@@ -1,6 +1,6 @@
-# app/services/sessao_service.py
+from datetime import timedelta
 
-from datetime import datetime, timedelta
+from app.utils.time_utils import agora_local
 
 from app.services.db import get_db_connection
 
@@ -56,7 +56,7 @@ def iniciar_sessao(token_acesso):
     cursor = conn.cursor()
 
     try:
-        inicio = datetime.now()
+        inicio = agora_local()
 
         cursor.execute(
             """
