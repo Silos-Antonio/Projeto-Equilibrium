@@ -1,4 +1,4 @@
-from app.utils.time_utils import agora_local
+from app.utils.time_utils import agora_local, para_timestamp_ms
 from datetime import timedelta
 from pathlib import Path
 from flask import Blueprint, flash, jsonify, redirect, render_template, request, send_file, url_for
@@ -89,8 +89,8 @@ def acessar_sessao(token):
 
             status = 'ativa'
 
-            fim_timestamp = int(
-                fim_real.timestamp() * 1000
+            fim_timestamp =  para_timestamp_ms(
+                fim_real
             )
 
 
