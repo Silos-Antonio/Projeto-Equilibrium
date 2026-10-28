@@ -63,6 +63,9 @@ def criar_paciente(
     cursor = conn.cursor()
     telefone = normalizar_telefone(telefone)
 
+    if not telefone:
+        return False, "O telefone é obrigatório."
+
     try:
         cursor.execute(
             """

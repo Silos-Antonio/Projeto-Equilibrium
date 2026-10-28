@@ -50,7 +50,7 @@ CREATE TABLE `pacientes` (
   `terapeuta_id` int NOT NULL,
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
+  `telefone` varchar(20) NOT NULL,
   `observacoes` text,
   `criado_em` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
