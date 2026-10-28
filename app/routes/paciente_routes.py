@@ -18,12 +18,25 @@ def gerir_pacientes():
 
         if not nome:
             flash('O nome do paciente é obrigatório.', 'error')
-        elif criar_paciente(terapeuta_id, nome, email, telefone, observacoes):
-            flash('Paciente registrado com sucesso!', 'success')
         else:
-            flash('Erro ao registrar o paciente.', 'error')
-            
-        return redirect(url_for('paciente.gerir_pacientes'))
+            sucesso, mensagem = criar_paciente(
+                terapeuta_id,
+                nome,
+                email,
+                telefone,
+                observacoes
+            )
+
+            if sucesso:
+                flash(
+                    'Paciente registrado com sucesso!',
+                    'success'
+                )
+            else:
+                flash(
+                    mensagem,
+                    'error'
+                )
 
     # ===== LÓGICA DE PAGINAÇÃO =====
     # Pega a página da URL (ex: ?page=2). Se não existir, o padrão é 1.
