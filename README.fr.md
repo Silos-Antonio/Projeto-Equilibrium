@@ -9,7 +9,7 @@ Equilibrium est un projet de portfolio développé avec **Python, Flask et MySQL
 Le projet met l'accent non seulement sur les fonctionnalités, mais aussi sur la **sécurité, l'isolation des données, la maintenabilité et la reproductibilité de l'environnement**.
 
 > **Statut :** Projet de portfolio actif
-> **Démo en ligne :** Bientôt disponible
+> **Démo en ligne :** [https://projeto-equilibrium.onrender.com/](https://projeto-equilibrium.onrender.com/)
 
 ---
 
