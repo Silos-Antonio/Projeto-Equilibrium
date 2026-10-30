@@ -11,6 +11,7 @@
     --line:#e6e5dc;
     --ink:#2c3531;
     --muted:#748078;
+    --roxo-destaque: rgba(124, 58, 237, 0.35);
     --blue:#719eaa;
     --blue-pale:#e5f0f1;
     --peach:#c9856d;
@@ -312,7 +313,22 @@ label span {
     gap: 14px;
     min-height: 129px;
     padding: 18px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+    transform: scale(0.95); 
 }
+
+.stat-card:hover {
+    transform: translateY(-6px) scale(1);
+    
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    border-color: rgba(124, 58, 237, 0.2);
+}
+
 
 .stat-icon {
     align-items: center;
@@ -417,7 +433,13 @@ label span {
 .barra {
     border-radius: 6px 6px 0 0;
     transition: height .5s ease;
+    transform: scale(1.0);
     width: 39%;
+}
+
+.barra:hover {
+    box-shadow:  #A9BDA2 0 20px 25px -5px;
+    border-color: rgba(124, 58, 237, 0.2);
 }
 
 .barra.agendados {
@@ -426,6 +448,10 @@ label span {
 
 .barra.concluidos {
     background: var(--sage);
+}
+
+.barra.cancelados {
+    background: var(--danger);
 }
 
 .rotulo-dia {
@@ -463,6 +489,10 @@ label span {
     background: var(--sage);
 }
 
+.l-cancelados:before {
+    background: var(--danger);
+}
+
 .appointment-list {
     margin-top: 13px;
 }
@@ -472,7 +502,22 @@ label span {
     border-bottom: 1px solid var(--line);
     display: flex;
     gap: 11px;
-    padding: 12px 0;
+    padding: 12px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+    transform: scale(0.95);
+}
+
+.appointment-item:hover {
+    border-radius: 10px;
+    transform: translateY(-6px) scale(1);
+    
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    border-color: rgba(124, 58, 237, 0.2);
 }
 
 .appointment-item:last-child {
@@ -616,7 +661,7 @@ label span {
 }
 
 .agenda-hint span {
-    background: #91aa89;
+    background: var(--roxo-destaque);
     border-radius: 50%;
     display: inline-block;
     height: 7px;
@@ -709,6 +754,26 @@ td:first-child {
 .indicador-sessao {
     background: var(--blue-pale);
     color: #43737e;
+    animation: pulse-sutil 3s ease-in-out infinite;
+}
+
+@keyframes pulse-sutil {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-color: rgba(124, 58, 237, 0.2);
+    }
+    50% {
+        transform: scale(1.02); /* Mantém o crescimento sutil para não exagerar no movimento */
+        
+        /* Sombra bem mais intensa e espalhada, criando um efeito de luz (glow) */
+        box-shadow: 
+            0 0 25px 5px rgba(124, 58, 237, 0.35),
+            0 20px 25px -5px rgba(124, 58, 237, 0.2);
+            
+        /* Borda fica bem mais visível */
+        border-color: rgba(124, 58, 237, 0.6);
+    }
 }
 
 .status-agendada {
@@ -1556,6 +1621,7 @@ audio {
         min-height:105px;
         padding: 14px
     }
+
     .stat-icon {
         display:none
     }
@@ -1569,9 +1635,6 @@ audio {
         height:160px
     }
     .period-pill {
-        display:none
-    }
-    .schedule-table th:nth-child(3), .schedule-table td:nth-child(3) {
         display:none
     }
     .schedule-table th,.schedule-table td {
