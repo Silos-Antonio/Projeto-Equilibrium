@@ -1,0 +1,509 @@
+
+/* ========================================
+   1. Layout geral
+======================================== */
+
+.chakra-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+    gap: 1.25rem;
+    max-width: 1240px;
+    margin: 1.5rem auto;
+}
+
+/* Formulário de edição do paciente: rótulos e campos em colunas. */
+@media (min-width: 621px) {
+    #edit-patient-layout {
+        display: block;
+        width: 100%;
+        max-width: 1240px;
+    }
+
+    #form-edit-pacient {
+        width: 100%;
+    }
+}
+
+#form-edit-pacient {
+    display: block;
+    max-width: 100%;
+    margin: 2rem auto !important;
+}
+
+#form-edit-pacient form {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 1.25rem;
+    row-gap: 1.1rem;
+}
+
+#form-edit-pacient form > [type="hidden"],
+#form-edit-pacient .form-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    margin-top: 1.0rem;
+}
+
+#form-edit-pacient label {
+    margin: 0.55rem 0;
+}
+
+#form-edit-pacient textarea {
+    min-height: 7rem;
+}
+
+#form-edit-pacient .form-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+#form-edit-pacient .form-actions .button,
+#form-edit-pacient .form-actions a {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#form-edit-pacient .form-actions a {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+#form-edit-pacient .form-actions a:hover {
+    color: var(--sage-dark);
+}
+
+.chakra-card {
+    min-width: 0;
+}
+
+.chakra-hint {
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+}
+
+/* ========================================
+   2. Área de visualização dos chakras
+======================================== */
+
+.chakra-workspace {
+    display: grid;
+    grid-template-columns: minmax(210px, 0.8fr) minmax(250px, 1.2fr);
+    align-items: start;
+    gap: clamp(1.25rem, 4vw, 3rem);
+}
+
+.chakra-figure {
+    position: relative;
+    isolation: isolate;
+    pointer-events: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: min(100%, 340px);
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+
+    max-width: 340px;
+    aspect-ratio: 3 / 4;
+
+    margin: 0 auto;
+
+    background: radial-gradient(
+        ellipse at center,
+        #eaf0e9 0,
+        rgba(234, 240, 233, 0.45) 48%,
+        transparent 73%
+    );
+}
+
+/* Em desktop, divide melhor a área entre o mapa e os controles. */
+@media (min-width: 901px) {
+    .chakra-workspace {
+        grid-template-columns: minmax(210px, 1fr) minmax(230px, 1fr);
+        gap: clamp(16px, 2vw, 32px);
+    }
+
+    .chakra-figure {
+        width: min(100%, 420px);
+        max-width: 420px;
+    }
+}
+
+/* ========================================
+   3. Silhueta humana
+======================================== */
+
+
+
+.human-silhouette {
+    position: absolute;
+    top: 2%;
+    left: 50%;
+    z-index: 0;
+
+    width: 100%;
+    height: 150%;
+
+    opacity: 0.95;
+    overflow: hidden;
+    pointer-events: none;
+
+    transform: translateX(-50%);
+}
+
+/* A escala deriva da altura da figura; a largura automática mantém a proporção PNG. */
+.human-silhouette img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+
+    width: auto;
+    height: 100%;
+    max-width: none;
+    object-fit: contain;
+    object-position: center;
+
+    filter: drop-shadow(0 8px 12px rgba(61, 75, 66, 0.2));
+
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+/* ========================================
+   4. Orbes dos chakras
+======================================== */
+
+.chakra-orb-wrap {
+    position: absolute;
+    top: var(--y);
+    left: 50%;
+    z-index: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 0;
+    height: 0;
+
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.chakra-orb {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+
+    width: 25px;
+    height: 25px;
+
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle,
+        var(--chakra) 0%,
+        transparent 72%
+    );
+}
+
+/* Aura luminosa */
+
+.chakra-orb::before {
+    position: absolute;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    z-index: -1;
+
+    width: 152px;
+    height: 152px;
+
+    content: "";
+
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle,
+        var(--chakra) 0%,
+        transparent 72%
+    );
+
+    opacity: calc(0.18 + var(--balance, 0.5) * 0.42);
+
+    transform: translate(-50%, -50%)
+        scale(calc(0.58 + var(--balance, 0.5) * 0.52));
+
+    transition:
+        transform 0.32s ease,
+        opacity 0.32s ease;
+}
+
+/* Orbe com avaliação definida */
+
+.chakra-orb-wrap.is-set .chakra-orb {
+    box-shadow: 0 0 10px var(--chakra);
+}
+
+/* ========================================
+   5. Símbolos dos chakras
+======================================== */
+
+.chakra-symbol {
+    position: absolute;
+    z-index: 2;
+
+    width: 90px;
+    height: 90px;
+
+    object-fit: contain;
+    object-position: center;
+
+    pointer-events: none;
+
+    filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.8));
+}
+
+/* ========================================
+   6. Controles de avaliação
+======================================== */
+
+.chakra-controls {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.chakra-control {
+    pointer-events: auto;
+    padding: 0.35rem 0 0.55rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.chakra-control label {
+    margin: 0.15rem 0 0.3rem;
+}
+
+.chakra-control label span {
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.chakra-control small {
+    color: var(--muted);
+    font-size: 0.75rem;
+}
+
+/* ========================================
+   7. Sliders
+======================================== */
+
+.slider-row {
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 1fr 52px;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.slider-row input[type="range"] {
+    --chakra: inherit;
+
+    appearance: none;
+
+    height: 7px;
+    margin: 10px 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: linear-gradient(
+        to right,
+        var(--chakra) 0%,
+        var(--chakra) var(--range-progress, 50%),
+        #e5e8e2 var(--range-progress, 50%),
+        #e5e8e2 100%
+    );
+
+    touch-action: pan-y;
+    pointer-events: auto;
+}
+
+/* Slider - Chrome, Edge e Safari */
+
+.slider-row input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+
+    width: 20px;
+    height: 20px;
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    background: var(--chakra);
+
+    box-shadow: 0 1px 5px #0003;
+}
+
+/* Slider - Firefox */
+
+.slider-row input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    background: var(--chakra);
+
+    box-shadow: 0 1px 5px #0003;
+}
+
+/* Acessibilidade: foco pelo teclado */
+
+.slider-row input[type="range"]:focus-visible {
+    outline: 3px solid color-mix(
+        in srgb,
+        var(--chakra),
+        transparent 60%
+    );
+
+    outline-offset: 4px;
+}
+
+/* Valor do slider */
+
+.slider-row output {
+    color: var(--chakra);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* ========================================
+   8. Observações
+======================================== */
+
+.chakra-card textarea {
+    margin-bottom: 0.75rem;
+}
+
+/* ========================================
+   9. Histórico de avaliações
+======================================== */
+
+.chakra-history {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.history-item {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.history-item summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.history-item p {
+    white-space: pre-wrap;
+}
+
+.history-levels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+
+    padding: 1rem 0;
+}
+
+.history-levels span {
+    font-size: 0.86rem;
+}
+
+/* ========================================
+   10. Responsividade
+======================================== */
+
+/* Tablets e telas intermediárias */
+
+@media (max-width: 900px) {
+    .chakra-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .chakra-workspace {
+        grid-template-columns:
+            minmax(190px, 0.8fr)
+            minmax(240px, 1.2fr);
+    }
+}
+
+/* Smartphones */
+
+@media (max-width: 620px) {
+    #form-edit-pacient {
+        max-width: 100% !important;
+    }
+
+    #form-edit-pacient form {
+        grid-template-columns: 1fr;
+        gap: 0.15rem;
+    }
+
+    #form-edit-pacient form > [type="hidden"],
+    #form-edit-pacient .form-actions {
+        grid-column: 1;
+    }
+
+    #form-edit-pacient .form-actions {
+        justify-content: space-between;
+    }
+
+    .chakra-layout {
+        margin: 1rem auto;
+    }
+
+    .chakra-workspace {
+        grid-template-columns: 1fr;
+        gap: 4.5rem; /* Aumenta o espaçamento entre a figura e os controles */
+    }
+
+    .chakra-figure {
+        width: min(100%, 360px); /* Reduz levemente a largura máxima no celular */
+        max-width: 360px;
+        margin: 0 auto 5.8rem; /* Adiciona respiro embaixo da figura */
+        order: 0;
+    }
+
+    .chakra-controls {
+        order: 1;
+    }
+
+    .history-levels {
+        grid-template-columns: 1fr 1fr;
+    }
+}

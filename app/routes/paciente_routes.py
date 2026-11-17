@@ -1,6 +1,17 @@
 from flask import Blueprint, abort, render_template, request, redirect, url_for, session, flash
 from app.utils.decorators import login_required
 from app.services.paciente_service import atualizar_paciente, buscar_paciente_do_terapeuta, listar_pacientes_do_terapeuta, criar_paciente
+from app.services.chakra_service import listar_avaliacoes
+
+CHAKRA_APRESENTACAO = [
+    {'id': 'CORONARIO', 'nome': 'Coronário', 'cor': '#8b5cf6', 'simbolo': 'ॐ'},
+    {'id': 'FRONTAL', 'nome': 'Frontal', 'cor': '#4f46e5', 'simbolo': 'ॐ'},
+    {'id': 'LARINGEO', 'nome': 'Laríngeo', 'cor': '#2583d8', 'simbolo': 'हं'},
+    {'id': 'CARDIACO', 'nome': 'Cardíaco', 'cor': '#36a66b', 'simbolo': 'यं'},
+    {'id': 'PLEXO_SOLAR', 'nome': 'Plexo Solar', 'cor': '#e6b832', 'simbolo': 'रं'},
+    {'id': 'SACRAL', 'nome': 'Sacral', 'cor': '#ed8737', 'simbolo': 'वं'},
+    {'id': 'BASICO', 'nome': 'Básico', 'cor': '#d84a4a', 'simbolo': 'लं'},
+]
 
 paciente_bp = Blueprint('paciente', __name__)
 
@@ -79,4 +90,5 @@ def editar_paciente(paciente_id):
                 return redirect(url_for('paciente.gerir_pacientes'))
             flash(mensagem, 'error')
         paciente.update(nome=nome, email=email, telefone=telefone, observacoes=observacoes)
-    return render_template('editar_paciente.html', paciente=paciente)
+    historico_avaliacoes = listar_avaliacoes(terapeuta_id, paciente_id)
+    return render_template('editar_paciente.html', paciente=paciente, historico_avaliacoes=historico_avaliacoes, chakras=CHAKRA_APRESENTACAO)

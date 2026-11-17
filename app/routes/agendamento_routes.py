@@ -37,11 +37,16 @@ def gerir_agendamentos():
                 terapeuta_id, paciente_id, inicio, duracao_minutos, request.form.get('observacoes', ''), musica
             )
             if sucesso:
-                flash(f'Agendamento criado. Link da sessão: {url_for("sessao.acessar_sessao", token=resultado, _external=True)}', 'success')
+                # O serviço só retorna sucesso após o commit da sessão.
+                session['link_sessao_pendente_copia'] = url_for(
+                    'sessao.acessar_sessao', token=resultado, _external=True
+                )
+                flash('Agendamento criado com sucesso.', 'success')
             else:
                 flash(resultado, 'error')
         return redirect(url_for('agendamento.gerir_agendamentos'))
 
+    link_sessao_pendente_copia = session.pop('link_sessao_pendente_copia', None)
     encerrar_sessoes_expiradas(terapeuta_id)
 
     pagina = request.args.get('page', 1, type=int)
@@ -59,7 +64,8 @@ def gerir_agendamentos():
         pacientes=pacientes_lista,        # 2. Passa a lista limpa para o Jinja
         agendamentos=paginacao['items'], 
         paginacao=paginacao,   
-        musicas=OPCOES_MUSICA            
+        musicas=OPCOES_MUSICA,
+        link_sessao_pendente_copia=link_sessao_pendente_copia,
     )
 
 

@@ -104,7 +104,6 @@ CREATE TABLE `usuarios` (
   UNIQUE KEY `telefone` (`telefone`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
 --
 -- Dumping routines for database 'equilibrium'
 --

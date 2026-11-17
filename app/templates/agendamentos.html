@@ -18,6 +18,18 @@ Agenda • Equilibrium
             </div>
         </section>
 
+        <div
+            id="agenda-feedback"
+            class="agenda-feedback"
+            role="status"
+            aria-live="polite"
+            hidden
+            data-copy-link-on-load="{{ link_sessao_pendente_copia or '' }}"
+        ></div>
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            <p class="agenda-notice {{ category }}" role="status">{{ message }}</p>
+        {% endfor %}
+
         <section class="schedule-layout">
             <aside class="card booking-form">
                 <p class="eyebrow">Novo encontro</p>
@@ -72,7 +84,8 @@ Agenda • Equilibrium
                             <th>Paciente</th>
                             <th>Data e horário</th>
                             <th>Status</th>
-                            <th></th></tr>
+                            <th>Acesso</th>
+                            <th>Ações</th></tr>
                         </thead>
                         <tbody>
                             {% for agendamento in agendamentos %}
@@ -124,13 +137,22 @@ Agenda • Equilibrium
 
                                     <td>
                                         {% if agendamento.status == 'AGENDADO' %}
-                                            <a
-                                                href="{{ url_for('sessao.acessar_sessao', token=agendamento.token_acesso) }}"
-                                                class="text-link"
-                                                target="_blank"
-                                            >
-                                                Abrir sessão →
-                                            </a>
+                                            <div class="session-actions">
+                                                <a
+                                                    href="{{ url_for('sessao.acessar_sessao', token=agendamento.token_acesso) }}"
+                                                    class="button button-primary session-access"
+                                                    target="_blank"
+                                                >
+                                                    Acessar sessão
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    class="button session-copy"
+                                                    data-copy-session-link="{{ url_for('sessao.acessar_sessao', token=agendamento.token_acesso, _external=True) }}"
+                                                >
+                                                    Copiar link
+                                                </button>
+                                            </div>
                                         {% endif %}
                                     </td>
 
@@ -171,7 +193,7 @@ Agenda • Equilibrium
 
                             {% else %}
                                 <tr>
-                                    <td colspan="4" class="empty">
+                                    <td colspan="5" class="empty">
                                         Ainda não há encontros agendados.
                                     </td>
                                 </tr>

@@ -5,12 +5,16 @@
 Editar paciente • Equilibrium
 {% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chakra.css') }}">
+{% endblock %}
+
 
 {% block app_content %}
 
-<main class="layout">
+<main class="layout" id="edit-patient-layout">
 
-    <section class="card form-card" style="max-width: 600px; margin: 0 auto; width: 100%;">
+    <section class="card form-card" id="form-edit-pacient">
         <h2>Editar paciente</h2>
 
         <div class="messages">
@@ -51,7 +55,7 @@ Editar paciente • Equilibrium
                     Voltar
                 </a>
 
-                <button type="submit" class="button button-primary form-submit">
+                <button type="submit" class="button button-primary form-submit" id="submit-paciente">
                     Salvar alterações
                 </button>
 
@@ -63,4 +67,73 @@ Editar paciente • Equilibrium
 
 </main>
 
+<main class="chakra-layout" id="avaliacao-chakras">
+    <section class="card chakra-card">
+        <p class="eyebrow">Acompanhamento independente das sessões</p>
+        <h2>Avaliação dos chakras</h2>
+        <p class="chakra-hint">Defina os sete níveis de equilíbrio. Os controles começam sem valor selecionado.</p>
+        <form method="post" action="{{ url_for('chakra.criar', paciente_id=paciente.id) }}" id="chakra-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="chakra-workspace">
+                <div class="chakra-figure" aria-label="Mapa visual dos sete chakras">
+                    <div class="human-silhouette" aria-hidden="true">
+                        <img src="{{ url_for('static', filename='img/silhouette.png') }}" alt="">
+                    </div>
+                    {% for chakra in chakras %}
+                    {# Posições relativas à figura: calculadas a partir dos marcos visíveis da PNG. #}
+                    {% set chakra_y = [14.9, 24.3, 34.7, 44.9, 55.3, 66, 77] %}
+                    <div class="chakra-orb-wrap" style="--y: {{ chakra_y[loop.index0] }}%; --chakra: {{ chakra.cor }}" data-chakra="{{ chakra.id }}">
+                        <span class="chakra-orb"></span>
+                        <img
+                            class="chakra-symbol"
+                            src="{{ url_for('static', filename='img/chakras/' ~ chakra.id|lower ~ '.png') }}"
+                            alt=""
+                            aria-hidden="true"
+                        >
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="chakra-controls">
+                    {% for chakra in chakras %}
+                    <div class="chakra-control" style="--chakra: {{ chakra.cor }}">
+                        <label for="nivel-{{ chakra.id }}">{{ chakra.nome }} <span>({{ chakra.id|replace('_', ' ')|title }})</span></label>
+                        <div class="slider-row">
+                            <input id="nivel-{{ chakra.id }}" name="nivel_{{ chakra.id }}" type="range" min="0" max="100" step="1" value="50" data-chakra-control="{{ chakra.id }}" aria-valuetext="Ainda não definido">
+                            <output for="nivel-{{ chakra.id }}" data-percent="{{ chakra.id }}">—%</output>
+                        </div>
+                        <small data-state="{{ chakra.id }}">Nível não confirmado</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <label for="chakra-observacoes">Observações <span>(opcional)</span></label>
+            <textarea id="chakra-observacoes" name="observacoes" rows="3" maxlength="10000"></textarea>
+            <button class="button button-primary form-submit" type="submit">Salvar avaliação completa</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h2>Histórico de avaliações</h2>
+        <div class="chakra-history">
+        {% for avaliacao in historico_avaliacoes %}
+            <details class="history-item">
+                <summary>Avaliação de {{ avaliacao.criado_em.strftime('%d/%m/%Y %H:%M') if avaliacao.criado_em else 'data indisponível' }}</summary>
+                <div class="history-levels">
+                {% for chakra in chakras %}
+                    <span><b>{{ chakra.nome }}:</b> {{ avaliacao.itens.get(chakra.id, '—') }}%</span>
+                {% endfor %}
+                </div>
+                {% if avaliacao.observacoes %}<p>{{ avaliacao.observacoes }}</p>{% endif %}
+            </details>
+        {% else %}
+            <p class="empty">Ainda não há avaliações para este paciente.</p>
+        {% endfor %}
+        </div>
+    </section>
+</main>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/chakra.js') }}" defer></script>
 {% endblock %}

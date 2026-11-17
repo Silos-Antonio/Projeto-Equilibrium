@@ -8,6 +8,7 @@ from app.routes.admin_routes import admin_bp
 from app.routes.agendamento_routes import agendamento_bp
 from app.routes.auth_routes import auth_bp
 from app.routes.dashboard_routes import dashboard_bp
+from app.routes.chakra_routes import chakra_bp
 from app.routes.paciente_routes import paciente_bp
 from app.routes.sessao_routes import sessao_bp
 from app.services.db import get_db_connection
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(paciente_bp)
+    app.register_blueprint(chakra_bp)
     app.register_blueprint(agendamento_bp)
     app.register_blueprint(sessao_bp)
     app.register_blueprint(admin_bp)
